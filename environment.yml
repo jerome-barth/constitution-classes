@@ -4,13 +4,6 @@ channels:
   - damianavila82
   - conda-forge
 dependencies:
-  - python=3.5
-  - nbpresent
-  - numpy
-  - matplotlib
-  - pandas
-  - bokeh
-  - rise
   - jupyter_contrib_nbextensions
   - jupyter_nbextensions_configurator
   - ipywidgets
