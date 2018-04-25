@@ -8,4 +8,4 @@ dependencies:
   - jupyter_nbextensions_configurator
   - ipywidgets
   - notebook
-  - XlsxWriter
+  - XlsxWriter=1.0.4
