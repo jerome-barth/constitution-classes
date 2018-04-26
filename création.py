@@ -276,6 +276,13 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     #     liste.protect()
     liste.activate()
 
+def jupyter():
+    try:
+        shell = get_ipython().__class__.__name__
+        return shell == 'ZMQInteractiveShell'
+    except NameError:
+        return False
+
 if jupyter():
     display(
         HTML('<a href="./' + NOM_FICHIER +
