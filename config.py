@@ -1,4 +1,4 @@
-DEBUG = True
+DEBUG = False
 
 from datetime import datetime
 from collections import OrderedDict

@@ -152,41 +152,68 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     # -~- Liste -~-
     # Entête
     rep(dern_recap + 1, 0, 'Nom', {**F_ENT, **F_HB, **F_GAUCHE})
-    fmt = workbook.add_format({
-        **F_ENT,
-        **F_HB,
-    })
+    fmt = workbook.add_format({**F_ENT, **F_HB, **F_UNL})
     liste.write_row(
         dern_recap + 1, 1,
         ['Prénom', 'Sexe', 'Retard', 'Niv', 'Comp', CLASSES, 'Cls orig'], fmt)
+    rep(
+        dern_recap + 1, 6, CLASSES, {
+            **F_DEF,
+            **F_HB, 'font_color': C_CAT['CLS'][0],
+            'bg_color': C_CAT['CLS'][1]
+        })
     for i, lv2 in enumerate(LV2S_VRAIES):
-        rep(dern_recap + 1, 8 + i, lv2, {**F_ENT, **F_HB})
+        rep(dern_recap + 1, 8 + i, lv2, {**F_LV, **F_GRAS, **F_HB, **F_UNL})
     compt = 0
     for i, opt in enumerate(OPTIONS_UNIQUES):
         col = 8 + len(LV2S_VRAIES) + i + compt
-        rep(dern_recap + 1, col, opt, {**F_ENT, **F_HB})
+        rep(dern_recap + 1, col, opt, {
+            **F_OPT3[i % 3],
+            **F_GRAS,
+            **F_HB,
+            **F_UNL
+        })
         if opt in OPTIONS_CAT:
             compt += 1
             liste.set_column(col, col, 6)
             liste.set_column(col + 1, col + 1, 15)
-            rep(dern_recap + 1, col + 1, OPTIONS_CAT[opt], {**F_ENT, **F_HB})
+            rep(dern_recap + 1, col + 1, OPTIONS_CAT[opt], {
+                **F_OPT3[i % 3],
+                **F_GRAS,
+                **F_HB,
+                **F_UNL
+            })
         else:
             liste.set_column(col, col, 6)
     col = 8 + len(LV2S_VRAIES) + compt + len(OPTIONS_UNIQUES)
     liste.set_column(col, col, 25)
-    rep(dern_recap + 1, col, 'Observations', {**F_ENT, **F_HB, **F_DROITE})
-    ###TESTS###
+    rep(dern_recap + 1, col, 'Observations', {
+        **F_ENT,
+        **F_HB,
+        **F_DROITE,
+        **F_UNL,
+    })
+    premier_el = dern_recap + 2
+    dernier_el = premier_el + NB_ELV - 1
+    for i in range(col + 1):
+        rep(dernier_el + 1, i, None, F_HAUT)
 
-    if DEBUG:
-        donnees = [[
-            'AUBLE', 'Ayyoub', 'G', '', 'A', 'A', '', '5E2', 1, '', '', 1,
-            'GYMNASTIQUE G', '', 'Observation'
-        ], [
-            'BELMELIANI', 'Elias', 'G', '', 'B', 'B', '', '5E2', '', 1, '', '',
-            '', 1, 'Obs'
-        ]]
-        for i, ligne in enumerate(donnees):
-            liste.write_row(dern_recap + 5 + i, 0, ligne)
+    # Déverrouille les lignes entête et élèves
+    liste.set_row(premier_el - 1, 20, workbook.add_format(F_UNL))
+    for el in range(NB_ELV):
+        liste.set_row(premier_el + el, None, workbook.add_format(F_UNL))
+    liste.autofilter(premier_el - 1, 0, dernier_el, col)
+    ###TESTS###
+    from random import randint
+    for el in range(NB_ELV):
+        liste.write_row(premier_el + el, 0, [
+            'Nom' + str(el + 1), 'Prénom', ['F', 'G'][randint(0, 1)],
+            ['', 'R'][randint(0, 1)], NIVEAUX[randint(0, 4)], NIVEAUX[randint(
+                0, 4)], '', '3e1', 1, '', '', 1, 'FOOTBALL G', 1, 'Obs'
+        ], workbook.add_format({
+            **F_UNL, 'italic': True
+        }))
+
     ###########################
     ###                     ###
     ###  Feuille 'Patates'  ###
@@ -335,7 +362,13 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     patates.freeze_panes(3, 1)
 
     #     patates.protect()
-    #     liste.protect()
+    liste.protect(
+        options={
+            'insert_rows': True,
+            'delete_rows': True,
+            'sort': True,
+            'autofilter': True,
+        })
     liste.activate()
 
 
