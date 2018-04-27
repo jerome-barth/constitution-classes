@@ -1,4 +1,3 @@
-
 DEBUG = True
 
 from datetime import datetime
@@ -21,6 +20,8 @@ assert (NB_DIVS == len(NOM_DIVS)
 NB_ELV = 25 * NB_DIVS + 20  # nb de lignes à prévoir dans la liste d'élèves
 
 LV2S = ['All2', 'Ita2', 'Esp2', 'Sans LV2']
+LV2S_VRAIES = LV2S[:-1]  # LV2 à afficher dans la liste
+
 OPTIONS = OrderedDict([
     ('Sans opt', []),
     ('Sport', ['Sport']),
@@ -28,6 +29,9 @@ OPTIONS = OrderedDict([
     ('Sp-lat', ['Sport', 'Latin']),
 ])
 OPTIONS_UNIQUES = [opt for opt in OPTIONS if len(OPTIONS[opt]) == 1]
+OPTIONS_CAT = {
+    'Sport': 'Section'
+}  # Créer une colonne supplém 'Section' pour le type de sport
 
 NIVEAUX = ['A', 'B', 'C', 'D', 'E']
 

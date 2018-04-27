@@ -1,4 +1,3 @@
-
 # coding: utf-8
 from config import *
 from formats import *
@@ -69,7 +68,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     ##############################
     liste.set_column(0, 0, 20)
     liste.set_column(1, 1, 15)
-    liste.set_column(2, 8 + len(LV2S) + len(OPTIONS_UNIQUES), 7)
+    liste.set_column(2, 7 + len(LV2S_VRAIES), 6)
     rep(0, 0, 'R' + str(ANNEE), F_RENTREE)
     etab = ETABLISSEMENT.split(' ', maxsplit=1)
     rep(1, 0, etab[0], F_ETAB)
@@ -84,6 +83,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
             'bg_color': C_CAT['CLS'][1]
         })
 
+    # Tab récap étiquettes
     rep(1, 1, 'Effectif', {**F_ENT, **F_BORD})
     rep(2, 1, 'F', {**F_F, **F_GRAS, **F_HAUT, **F_COTES})
     rep(3, 1, 'G', {**F_G, **F_GRAS, **F_COTES})
@@ -92,15 +92,40 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     liste.set_row(3, None, None, {'level': 1})
     liste.set_row(4, None, None, {'level': 1})
 
+    # Tab récap étiquettes niveaux
     for i, niv in enumerate(NIVEAUX):
-        rep(5 + i, 1, niv, {**F_NIV[niv], **F_GRAS})
+        bordure = {**F_COTES}
+        if i == 0: bordure = {**bordure, **F_HAUT}
+        if i == len(NIVEAUX) - 1: bordure = {**bordure, **F_BAS}
+        rep(5 + i, 1, niv, {**F_NIV[niv], **F_GRAS, **bordure})
         if i != 0: liste.set_row(5 + i, None, None, {'level': 1})
-
+    lig_opt = 6 + len(NIVEAUX)
+    rep(lig_opt - 1, 1, 'R', {**F_R, **F_GRAS, **F_BORD})
+    # Tab récap étiquettes options
+    for i, opt in enumerate(OPTIONS_UNIQUES):
+        bordure = {**F_COTES}
+        if i == 0: bordure = {**bordure, **F_HAUT}
+        if i == len(OPTIONS_UNIQUES) - 1: bordure = {**bordure, **F_BAS}
+        rep(lig_opt + i, 1, opt, {**F_OPT3[i % 3], **F_GRAS, **bordure})
+        liste.set_row(lig_opt + i, None, None, {'level': 1})
+    # Tab récap étiquettes LV2
+    lig_lv2 = lig_opt + len(OPTIONS_UNIQUES)
+    for i, lv2 in enumerate(LV2S):
+        bordure = {**F_COTES}
+        if i == 0: bordure = {**bordure, **F_HAUT}
+        if i == len(LV2S) - 1: bordure = {**bordure, **F_BAS}
+        rep(lig_lv2 + i, 1, lv2, {**F_LV, **F_GRAS, **bordure})
+        if i != 0: liste.set_row(lig_lv2 + i, None, None, {'level': 1})
+    # Dernière ligne avant la liste
+    dern_recap = lig_lv2 + len(LV2S)
+    liste.set_row(dern_recap, 5)
+    for i in range(NB_DIVS + 4):
+        rep(dern_recap, i + 1, None, F_HAUT)
     # Tableau récap : colonnes des classes
     for div, nom_div in enumerate(NOM_DIVS):
         bordure = {}
         if div == 0: bordure = {**F_GAUCHE}
-        if div == NB_DIVS - 1: bordure = {**bordure, **F_DROITE}
+        if div == NB_DIVS - 1: bordure = {**bordure, **F_HB, **F_DROITE}
         rep(
             0, 2 + div, nom_div, {
                 **F_CLS,
@@ -124,7 +149,44 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         **F_TOTAUX,
         **F_BORD,
     })
+    # -~- Liste -~-
+    # Entête
+    rep(dern_recap + 1, 0, 'Nom', {**F_ENT, **F_HB, **F_GAUCHE})
+    fmt = workbook.add_format({
+        **F_ENT,
+        **F_HB,
+    })
+    liste.write_row(
+        dern_recap + 1, 1,
+        ['Prénom', 'Sexe', 'Retard', 'Niv', 'Comp', CLASSES, 'Cls orig'], fmt)
+    for i, lv2 in enumerate(LV2S_VRAIES):
+        rep(dern_recap + 1, 8 + i, lv2, {**F_ENT, **F_HB})
+    compt = 0
+    for i, opt in enumerate(OPTIONS_UNIQUES):
+        col = 8 + len(LV2S_VRAIES) + i + compt
+        rep(dern_recap + 1, col, opt, {**F_ENT, **F_HB})
+        if opt in OPTIONS_CAT:
+            compt += 1
+            liste.set_column(col, col, 6)
+            liste.set_column(col + 1, col + 1, 15)
+            rep(dern_recap + 1, col + 1, OPTIONS_CAT[opt], {**F_ENT, **F_HB})
+        else:
+            liste.set_column(col, col, 6)
+    col = 8 + len(LV2S_VRAIES) + compt + len(OPTIONS_UNIQUES)
+    liste.set_column(col, col, 25)
+    rep(dern_recap + 1, col, 'Observations', {**F_ENT, **F_HB, **F_DROITE})
+    ###TESTS###
 
+    if DEBUG:
+        donnees = [[
+            'AUBLE', 'Ayyoub', 'G', '', 'A', 'A', '', '5E2', 1, '', '', 1,
+            'GYMNASTIQUE G', '', 'Observation'
+        ], [
+            'BELMELIANI', 'Elias', 'G', '', 'B', 'B', '', '5E2', '', 1, '', '',
+            '', 1, 'Obs'
+        ]]
+        for i, ligne in enumerate(donnees):
+            liste.write_row(dern_recap + 5 + i, 0, ligne)
     ###########################
     ###                     ###
     ###  Feuille 'Patates'  ###
@@ -276,6 +338,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     #     liste.protect()
     liste.activate()
 
+
 def jupyter():
     try:
         shell = get_ipython().__class__.__name__
@@ -283,9 +346,12 @@ def jupyter():
     except NameError:
         return False
 
+
 if jupyter():
     display(
         HTML('<a href="./' + NOM_FICHIER +
              '" target="_blank">Lien vers le fichier</a>'))
 else:
+    import os
+    os.startfile(NOM_FICHIER)
     print("Fini !")

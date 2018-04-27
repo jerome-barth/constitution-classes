@@ -1,6 +1,6 @@
 # Formats de base
 
-from config import *
+from config import C_CAT
 
 F_DEF = {'align': 'center', 'valign': 'vcenter', 'font_size': 11}
 F_PETIT = {'font_size': 10}
@@ -75,3 +75,18 @@ F_NIV = {
     }
 }
 F_R = {**F_DEF, 'font_color': C_CAT['R'][0], 'bg_color': C_CAT['R'][1]}
+F_OPT3 = [
+    {
+        **F_DEF, 'font_color': C_CAT['opt1'][0],
+        'bg_color': C_CAT['opt1'][1]
+    },
+    {
+        **F_DEF, 'font_color': C_CAT['opt2'][0],
+        'bg_color': C_CAT['opt2'][1]
+    },
+    {
+        **F_DEF, 'font_color': C_CAT['opt3'][0],
+        'bg_color': C_CAT['opt3'][1]
+    },
+]
+F_LV = {**F_DEF, 'font_color': C_CAT['LV2'][0], 'bg_color': C_CAT['LV2'][1]}
