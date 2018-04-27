@@ -1,4 +1,4 @@
-DEBUG = False
+DEBUG = True
 
 from datetime import datetime
 from collections import OrderedDict
@@ -18,7 +18,7 @@ assert (NB_DIVS == len(NOM_DIVS)
         ), "Il faut autant de noms que de divisions prévues"
 
 NB_ELV = 25 * NB_DIVS + 20  # nb de lignes à prévoir dans la liste d'élèves
-
+if DEBUG: NB_ELV = 10
 LV2S = ['All2', 'Ita2', 'Esp2', 'Sans LV2']
 LV2S_VRAIES = LV2S[:-1]  # LV2 à afficher dans la liste
 

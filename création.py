@@ -57,8 +57,8 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     # Ajout des feuilles 'Patates' et 'Xe-20XX-XX'
     patates = workbook.add_worksheet('Patates')
     patates.outline_settings(symbols_below=False)
-    liste = workbook.add_worksheet(
-        CLASSES + ' ' + str(2000 + ANNEE) + '-' + str(ANNEE + 1))
+    nom_liste = CLASSES + ' ' + str(2000 + ANNEE) + '-' + str(ANNEE + 1)
+    liste = workbook.add_worksheet(nom_liste)
     liste.outline_settings(symbols_below=False)
 
     ##############################
@@ -66,6 +66,41 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     ###  Feuille 'Xe-20XX-XX'  ###
     ###                        ###
     ##############################
+    # Repère dans les lignes
+    lig_opt = 6 + len(NIVEAUX)  # ligne des options
+    lig_lv2 = lig_opt + len(OPTIONS_UNIQUES)  # ligne des lv2
+    dern_recap = lig_lv2 + len(LV2S)  # dernière ligne avant la liste
+    premier_el = dern_recap + 2  # ligne du 1er élève
+    dernier_el = premier_el + NB_ELV - 1  # ligne du dernier élève
+
+    # Création des noms de plage
+    def plage_col(nom, col):
+        plage = lig_col(
+            premier_el, col, lig_abs=True, col_abs=True) + ":" + lig_col(
+                dernier_el, col, lig_abs=True, col_abs=True)
+        workbook.define_name('_' + nom, "='" + nom_liste + "'!" + plage)
+
+    plage_col('Nom', 0)
+    plage_col('Prénom', 1)
+    plage_col('Sexe', 2)
+    plage_col('Retard', 3)
+    plage_col('Niveau', 4)
+    plage_col('Comportement', 5)
+    plage_col('Classe', 6)
+    plage_col('DivOrig', 7)
+    nom_lv2 = []
+    for i, lv2 in enumerate(LV2S_VRAIES):
+        nosp = ''.join(lv2.split())
+        nom_lv2.append('_' + nosp)
+        plage_col(nosp, 8 + i)
+    nom_opt = []
+    compt = 0
+    for i, opt in enumerate(OPTIONS_UNIQUES):
+        nosp = ''.join(opt.split())
+        nom_opt.append('_' + nosp)
+        plage_col(nosp, 8 + len(LV2S_VRAIES) + i + compt)
+        if opt in OPTIONS_CAT: compt += 1
+
     liste.set_column(0, 0, 20)
     liste.set_column(1, 1, 15)
     liste.set_column(2, 7 + len(LV2S_VRAIES), 6)
@@ -86,8 +121,8 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     # Tab récap étiquettes
     rep(1, 1, 'Effectif', {**F_ENT, **F_BORD})
     rep(2, 1, 'F', {**F_F, **F_GRAS, **F_HAUT, **F_COTES})
-    rep(3, 1, 'G', {**F_G, **F_GRAS, **F_COTES})
-    rep(4, 1, '%F', {**F_PF, **F_BAS, **F_COTES})
+    rep(3, 1, 'G', {**F_G, **F_GRAS, **F_BAS, **F_COTES})
+    rep(4, 1, '%F', {**F_PF, **F_BORD, **F_COTES})
     liste.set_row(2, None, None, {'level': 1})
     liste.set_row(3, None, None, {'level': 1})
     liste.set_row(4, None, None, {'level': 1})
@@ -99,8 +134,8 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         if i == len(NIVEAUX) - 1: bordure = {**bordure, **F_BAS}
         rep(5 + i, 1, niv, {**F_NIV[niv], **F_GRAS, **bordure})
         if i != 0: liste.set_row(5 + i, None, None, {'level': 1})
-    lig_opt = 6 + len(NIVEAUX)
     rep(lig_opt - 1, 1, 'R', {**F_R, **F_GRAS, **F_BORD})
+
     # Tab récap étiquettes options
     for i, opt in enumerate(OPTIONS_UNIQUES):
         bordure = {**F_COTES}
@@ -108,24 +143,25 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         if i == len(OPTIONS_UNIQUES) - 1: bordure = {**bordure, **F_BAS}
         rep(lig_opt + i, 1, opt, {**F_OPT3[i % 3], **F_GRAS, **bordure})
         liste.set_row(lig_opt + i, None, None, {'level': 1})
+
     # Tab récap étiquettes LV2
-    lig_lv2 = lig_opt + len(OPTIONS_UNIQUES)
     for i, lv2 in enumerate(LV2S):
         bordure = {**F_COTES}
         if i == 0: bordure = {**bordure, **F_HAUT}
         if i == len(LV2S) - 1: bordure = {**bordure, **F_BAS}
         rep(lig_lv2 + i, 1, lv2, {**F_LV, **F_GRAS, **bordure})
         if i != 0: liste.set_row(lig_lv2 + i, None, None, {'level': 1})
+
     # Dernière ligne avant la liste
-    dern_recap = lig_lv2 + len(LV2S)
     liste.set_row(dern_recap, 5)
     for i in range(NB_DIVS + 4):
         rep(dern_recap, i + 1, None, F_HAUT)
+
     # Tableau récap : colonnes des classes
     for div, nom_div in enumerate(NOM_DIVS):
         bordure = {}
         if div == 0: bordure = {**F_GAUCHE}
-        if div == NB_DIVS - 1: bordure = {**bordure, **F_HB, **F_DROITE}
+        if div == NB_DIVS - 1: bordure = {**bordure, **F_DROITE}
         rep(
             0, 2 + div, nom_div, {
                 **F_CLS,
@@ -134,24 +170,115 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
                 **F_HB,
                 **bordure, 'bg_color': C_CLS[div][0]
             })
+        rep(1, 2 + div, '=COUNTIF(_Classe,' + lig_col(0, 2 + div) + ')', {
+            **F_CLS,
+            **F_HB,
+            **bordure, 'bg_color': C_CLS[div][1]
+        })
+        rep(2, 2 + div,
+            '=COUNTIFS(_Classe,' + lig_col(0, 2 + div) + ',_Sexe,B3)', {
+                **F_CLS,
+                **F_HAUT,
+                **bordure, 'bg_color': C_CLS[div][0]
+            })
+        rep(3, 2 + div,
+            '=COUNTIFS(_Classe,' + lig_col(0, 2 + div) + ',_Sexe,B4)', {
+                **F_CLS,
+                **F_BAS,
+                **bordure, 'bg_color': C_CLS[div][0]
+            })
+        rep(4, 2 + div, '=IF(' + lig_col(1, 2 + div) + '<>0,ROUND(' +
+            lig_col(2, 2 + div) + '/' + lig_col(1, 2 + div) + '*100,0),"*")', {
+                **F_CLS,
+                **F_BAS,
+                **bordure, 'bg_color': C_CLS[div][1]
+            })
+        for i, niv in enumerate(NIVEAUX):
+            bordure2 = {}
+            if i == 0: bordure2 = F_HAUT
+            if i == len(NIVEAUX) - 1: bordure2 = {**bordure2, **F_BAS}
+            rep(5 + i, 2 + div, '=COUNTIFS(_Classe,' + lig_col(0, 2 + div) +
+                ',_Niveau,' + lig_col(5 + i, 1) + ')', {
+                    **F_CLS,
+                    **bordure,
+                    **bordure2, 'bg_color': C_CLS[div][0]
+                })
+        rep(5 + len(NIVEAUX), 2 + div,
+            '=COUNTIFS(_Classe,' + lig_col(0, 2 + div) + ',_Retard,"R")', {
+                **F_CLS,
+                **F_HB,
+                **bordure, 'bg_color': C_CLS[div][1]
+            })
+        for i, opt in enumerate(OPTIONS_UNIQUES):
+            bordure2 = {}
+            if i == 0: bordure2 = {**bordure2, **F_HAUT}
+            if i == len(OPTIONS_UNIQUES) - 1: bordure2 = {**bordure2, **F_BAS}
+            rep(lig_opt + i, 2 + div, '=COUNTIFS(_Classe,' +
+                lig_col(0, 2 + div) + ',' + nom_opt[i] + ',1)', {
+                    **F_CLS,
+                    **bordure,
+                    **bordure2, 'bg_color': C_CLS[div][0]
+                })
+        for i, lv2 in enumerate(LV2S):
+            bordure2 = {}
+            if i == 0: bordure2 = {**bordure2, **F_HAUT}
+            if i == len(LV2S) - 1:
+                bordure2 = {**bordure2, **F_BAS}
+                rep(lig_lv2 + i, 2 + div, 'toto', {
+                        **F_CLS,
+                        **bordure,
+                        **bordure2, 'bg_color': C_CLS[div][0]
+                    })
+            else:
+                rep(lig_lv2 + i, 2 + div, '=COUNTIFS(_Classe,' +
+                    lig_col(0, 2 + div) + ',' + nom_lv2[i] + ',1)', {
+                    **F_CLS,
+                    **bordure,
+                    **bordure2, 'bg_color': C_CLS[div][0]
+                })
+
+    # Colonne NA
     rep(0, 2 + NB_DIVS, 'NA', {
         **F_CLS,
         **F_GRAS,
         **F_GROS,
         **F_BORD, 'bg_color': C_CLS[-1][0]
     })
+    rep(1, 2 + NB_DIVS, '=COUNTIF(_Classe,"NA")', {
+        **F_CLS,
+        **F_BORD,
+        **bordure, 'bg_color': C_CLS[-1][1]
+    })
+    # Colonne Reste
     rep(0, 3 + NB_DIVS, 'Reste', {
         **F_RESTE1,
         **F_GRAS,
         **F_BORD,
     })
+    rep(
+        1, 3 + NB_DIVS, '=COUNTBLANK(_Classe)', {
+            **F_CLS,
+            **F_BORD,
+            **bordure, 'font_color': C_CAT['Reste2'][0],
+            'bg_color': C_CAT['Reste2'][1]
+        })
+    # Colonne Totaux
     rep(0, 4 + NB_DIVS, 'Totaux', {
         **F_TOTAUX,
         **F_BORD,
     })
+    rep(
+        1, 4 + NB_DIVS,
+        '=SUM(' + lig_col(1, 2) + ':' + lig_col(1, 3 + NB_DIVS) + ')', {
+            **F_CLS,
+            **F_BORD,
+            **bordure, 'font_color': C_CAT['TOT2'][0],
+            'bg_color': C_CAT['TOT2'][1]
+        })
+
     # -~- Liste -~-
     # Entête
-    rep(dern_recap + 1, 0, 'Nom', {**F_ENT, **F_HB, **F_GAUCHE})
+    rep(dern_recap + 1, 0, 'Nom', {**F_ENT, **F_HB, **F_GAUCHE, **F_UNL})
     fmt = workbook.add_format({**F_ENT, **F_HB, **F_UNL})
     liste.write_row(
         dern_recap + 1, 1,
@@ -159,8 +286,10 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     rep(
         dern_recap + 1, 6, CLASSES, {
             **F_DEF,
-            **F_HB, 'font_color': C_CAT['CLS'][0],
-            'bg_color': C_CAT['CLS'][1]
+            **F_HB,
+            **F_UNL,
+            'font_color': C_CAT['CLS'][0],
+            'bg_color': C_CAT['CLS'][1],
         })
     for i, lv2 in enumerate(LV2S_VRAIES):
         rep(dern_recap + 1, 8 + i, lv2, {**F_LV, **F_GRAS, **F_HB, **F_UNL})
@@ -193,8 +322,6 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         **F_DROITE,
         **F_UNL,
     })
-    premier_el = dern_recap + 2
-    dernier_el = premier_el + NB_ELV - 1
     for i in range(col + 1):
         rep(dernier_el + 1, i, None, F_HAUT)
 
@@ -203,23 +330,69 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     for el in range(NB_ELV):
         liste.set_row(premier_el + el, None, workbook.add_format(F_UNL))
     liste.autofilter(premier_el - 1, 0, dernier_el, col)
-    ###TESTS###
-    from random import randint
+
+    ### TESTS ###
+    # insertion de données de test
+    test_nom = [
+        'BARTH', 'DEHRI', 'LOISEAU', 'NOEL', 'RUBASZEWSKI', 'TILLIET',
+        'VANHAREN'
+    ]
+    test_prenom = {
+        'Jérôme': 'G',
+        'Mohammed': 'G',
+        'Franck': 'G',
+        'Fanny': 'F',
+        'Julie': 'F',
+        'Céline': 'F',
+        'Marie Louis': 'G',
+    }
+    test_retard = [''] * 10 + ['R']
+    test_div = ['4e' + str(i + 1) for i in range(8)] + ['Nv3e']
+    test_lv2 = [[1, '', ''], ['', 1, ''], ['', '', 1]] * 5 + [['', '', '']]
+    test_sp = [['', '']] * 10 + [[1, 'FOOTBALL'], [1, 'GYMNASTIQUE'],
+                                 [1, 'BASKET']]
+    test_lat = [''] * 10 + [1]
+    test_obs = [''] * 5 + ['Teigne', 'Peste', 'Bon en maths']
+
+    from random import choice
     for el in range(NB_ELV):
-        liste.write_row(premier_el + el, 0, [
-            'Nom' + str(el + 1), 'Prénom', ['F', 'G'][randint(0, 1)],
-            ['', 'R'][randint(0, 1)], NIVEAUX[randint(0, 4)], NIVEAUX[randint(
-                0, 4)], '', '3e1', 1, '', '', 1, 'FOOTBALL G', 1, 'Obs'
-        ], workbook.add_format({
-            **F_UNL, 'italic': True
-        }))
+        nom = choice(test_nom)
+        prenom, sexe = choice(list(test_prenom.items()))
+        retard = choice(test_retard)
+        niv = choice(NIVEAUX)
+        comp = choice(NIVEAUX)
+        classe = choice(NOM_DIVS)
+        div_orig = choice(test_div)
+        lv2 = choice(test_lv2)
+        sport = choice(test_sp)
+        lat = choice(test_lat)
+        obs = choice(test_obs)
+        rep(premier_el + el, 0, nom, {
+            **F_DEF,
+            **F_GAUCHE,
+            **F_UNL, 'align': 'left'
+        })
+        rep(premier_el + el, 1, prenom, {**F_DEF, **F_UNL, 'align': 'left'})
+        rep(premier_el + el, 2, sexe, {**F_DEF, **F_UNL})
+        liste.write_row(
+            premier_el + el, 2,
+            [sexe, retard, niv, comp, classe, div_orig] + lv2 + sport + [lat],
+            workbook.add_format({
+                **F_DEF,
+                **F_UNL
+            }))
+        rep(premier_el + el, 14, obs, {
+            **F_DEF,
+            **F_DROITE,
+            **F_UNL, 'align': 'left'
+        })
 
     ###########################
     ###                     ###
     ###  Feuille 'Patates'  ###
     ###                     ###
     ###########################
-
+    patates.set_row(0, 42)
     pat_merge(0, 0, 0, 2 * NB_DIVS + 4,
               ETABLISSEMENT + ' - ' + VILLE + ' - ' + 'Rentrée R' + str(ANNEE),
               F_TITRE)
@@ -361,7 +534,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
 
     patates.freeze_panes(3, 1)
 
-    #     patates.protect()
+    patates.protect()
     liste.protect(
         options={
             'insert_rows': True,
@@ -387,4 +560,5 @@ if jupyter():
 else:
     import os
     os.startfile(NOM_FICHIER)
+    print("Création du fichier '{}'".format(NOM_FICHIER))
     print("Fini !")
