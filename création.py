@@ -89,10 +89,13 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     plage_col('Classe', 6)
     plage_col('DivOrig', 7)
     nom_lv2 = []
+    sans_lv2 = ''
     for i, lv2 in enumerate(LV2S_VRAIES):
         nosp = ''.join(lv2.split())
         nom_lv2.append('_' + nosp)
+        sans_lv2 += '_' + nosp + ',"",'
         plage_col(nosp, 8 + i)
+    sans_lv2 = sans_lv2[:-1]
     nom_opt = []
     compt = 0
     for i, opt in enumerate(OPTIONS_UNIQUES):
@@ -148,7 +151,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     for i, lv2 in enumerate(LV2S):
         bordure = {**F_COTES}
         if i == 0: bordure = {**bordure, **F_HAUT}
-        if i == len(LV2S) - 1: bordure = {**bordure, **F_BAS}
+        if i == len(LV2S) - 1: bordure = {**F_SLV, **bordure, **F_HB}
         rep(lig_lv2 + i, 1, lv2, {**F_LV, **F_GRAS, **bordure})
         if i != 0: liste.set_row(lig_lv2 + i, None, None, {'level': 1})
 
@@ -190,7 +193,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         rep(4, 2 + div, '=IF(' + lig_col(1, 2 + div) + '<>0,ROUND(' +
             lig_col(2, 2 + div) + '/' + lig_col(1, 2 + div) + '*100,0),"*")', {
                 **F_CLS,
-                **F_BAS,
+                **F_HB,
                 **bordure, 'bg_color': C_CLS[div][1]
             })
         for i, niv in enumerate(NIVEAUX):
@@ -223,19 +226,20 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
             bordure2 = {}
             if i == 0: bordure2 = {**bordure2, **F_HAUT}
             if i == len(LV2S) - 1:
-                bordure2 = {**bordure2, **F_BAS}
-                rep(lig_lv2 + i, 2 + div, 'toto', {
+                bordure2 = {**bordure2, **F_HB}
+                rep(lig_lv2 + i, 2 + div, '=COUNTIFS(_Classe,' +
+                    lig_col(0, 2 + div) + ',' + sans_lv2 + ')', {
                         **F_CLS,
                         **bordure,
-                        **bordure2, 'bg_color': C_CLS[div][0]
+                        **bordure2, 'bg_color': C_CLS[div][1]
                     })
             else:
                 rep(lig_lv2 + i, 2 + div, '=COUNTIFS(_Classe,' +
                     lig_col(0, 2 + div) + ',' + nom_lv2[i] + ',1)', {
-                    **F_CLS,
-                    **bordure,
-                    **bordure2, 'bg_color': C_CLS[div][0]
-                })
+                        **F_CLS,
+                        **bordure,
+                        **bordure2, 'bg_color': C_CLS[div][0]
+                    })
 
     # Colonne NA
     rep(0, 2 + NB_DIVS, 'NA', {
@@ -249,32 +253,167 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         **F_BORD,
         **bordure, 'bg_color': C_CLS[-1][1]
     })
+    rep(2, 2 + NB_DIVS, '=COUNTIFS(_Classe,"NA",_Sexe,B3)', {
+        **F_CLS,
+        **F_HAUT,
+        **F_COTES, 'bg_color': C_CLS[-1][0]
+    })
+    rep(3, 2 + NB_DIVS, '=COUNTIFS(_Classe,"NA",_Sexe,B4)', {
+        **F_CLS,
+        **F_BAS,
+        **F_COTES, 'bg_color': C_CLS[-1][0]
+    })
+    rep(4, 2 + NB_DIVS,
+        '=IF(' + lig_col(1, 2 + NB_DIVS) + '<>0,ROUND(' + lig_col(
+            2, 2 + NB_DIVS) + '/' + lig_col(1, 2 + NB_DIVS) + '*100,0),"*")', {
+                **F_CLS,
+                **F_BORD, 'bg_color': C_CLS[-1][1]
+            })
+    for i, niv in enumerate(NIVEAUX):
+        bordure2 = {}
+        if i == 0: bordure2 = F_HAUT
+        if i == len(NIVEAUX) - 1: bordure2 = {**bordure2, **F_BAS}
+        rep(5 + i, 2 + NB_DIVS,
+            '=COUNTIFS(_Classe,"NA",_Niveau,' + lig_col(5 + i, 1) + ')', {
+                **F_CLS,
+                **F_COTES,
+                **bordure2, 'bg_color': C_CLS[-1][0]
+            })
+    rep(5 + len(NIVEAUX), 2 + NB_DIVS, '=COUNTIFS(_Classe,"NA",_Retard,"R")', {
+        **F_CLS,
+        **F_HB,
+        **F_COTES, 'bg_color': C_CLS[-1][1]
+    })
+    for i, opt in enumerate(OPTIONS_UNIQUES):
+        bordure2 = {}
+        if i == 0: bordure2 = {**bordure2, **F_HAUT}
+        if i == len(OPTIONS_UNIQUES) - 1: bordure2 = {**bordure2, **F_BAS}
+        rep(lig_opt + i, 2 + NB_DIVS,
+            '=COUNTIFS(_Classe,"NA",' + nom_opt[i] + ',1)', {
+                **F_CLS,
+                **F_COTES,
+                **bordure2, 'bg_color': C_CLS[-1][0]
+            })
+    for i, lv2 in enumerate(LV2S):
+        bordure2 = {}
+        if i == 0: bordure2 = {**bordure2, **F_HAUT}
+        if i == len(LV2S) - 1:
+            bordure2 = {**bordure2, **F_HB}
+            rep(lig_lv2 + i, 2 + NB_DIVS,
+                '=COUNTIFS(_Classe,"NA",' + sans_lv2 + ')', {
+                    **F_CLS,
+                    **F_COTES,
+                    **bordure2, 'bg_color': C_CLS[-1][1]
+                })
+        else:
+            rep(lig_lv2 + i, 2 + NB_DIVS,
+                '=COUNTIFS(_Classe,"NA",' + nom_lv2[i] + ',1)', {
+                    **F_CLS,
+                    **F_COTES,
+                    **bordure2, 'bg_color': C_CLS[-1][0]
+                })
+
     # Colonne Reste
     rep(0, 3 + NB_DIVS, 'Reste', {
         **F_RESTE1,
         **F_GRAS,
         **F_BORD,
     })
-    rep(
-        1, 3 + NB_DIVS, '=COUNTBLANK(_Classe)', {
-            **F_CLS,
-            **F_BORD,
-            **bordure, 'font_color': C_CAT['Reste2'][0],
-            'bg_color': C_CAT['Reste2'][1]
-        })
+    rep(1, 3 + NB_DIVS, '=COUNTBLANK(_Classe)', {
+        **F_RESTE2,
+        **F_BORD,
+    })
+
+    rep(2, 3 + NB_DIVS, '=COUNTIFS(_Classe,"",_Sexe,B3)', {
+        **F_RESTE1,
+        **F_HAUT,
+        **F_COTES,
+    })
+    rep(3, 3 + NB_DIVS, '=COUNTIFS(_Classe,"",_Sexe,B4)', {
+        **F_RESTE1,
+        **F_BAS,
+        **F_COTES,
+    })
+    rep(4, 3 + NB_DIVS,
+        '=IF(' + lig_col(1, 3 + NB_DIVS) + '<>0,ROUND(' + lig_col(
+            2, 3 + NB_DIVS) + '/' + lig_col(1, 3 + NB_DIVS) + '*100,0),"*")', {
+                **F_RESTE2,
+                **F_BORD,
+            })
+    for i, niv in enumerate(NIVEAUX):
+        bordure2 = {}
+        if i == 0: bordure2 = F_HAUT
+        if i == len(NIVEAUX) - 1: bordure2 = {**bordure2, **F_BAS}
+        rep(5 + i, 3 + NB_DIVS,
+            '=COUNTIFS(_Classe,"",_Niveau,' + lig_col(5 + i, 1) + ')', {
+                **F_RESTE1,
+                **F_COTES,
+                **bordure2,
+            })
+    rep(5 + len(NIVEAUX), 3 + NB_DIVS, '=COUNTIFS(_Classe,"",_Retard,"R")', {
+        **F_RESTE2,
+        **F_HB,
+        **F_COTES,
+    })
+    for i, opt in enumerate(OPTIONS_UNIQUES):
+        bordure2 = {}
+        if i == 0: bordure2 = {**bordure2, **F_HAUT}
+        if i == len(OPTIONS_UNIQUES) - 1: bordure2 = {**bordure2, **F_BAS}
+        rep(lig_opt + i, 3 + NB_DIVS,
+            '=COUNTIFS(_Classe,"",' + nom_opt[i] + ',1)', {
+                **F_RESTE1,
+                **F_COTES,
+                **bordure2,
+            })
+    for i, lv2 in enumerate(LV2S):
+        bordure2 = {}
+        if i == 0: bordure2 = {**bordure2, **F_HAUT}
+        if i == len(LV2S) - 1:
+            bordure2 = {**bordure2, **F_HB}
+            rep(lig_lv2 + i, 3 + NB_DIVS,
+                '=COUNTIFS(_Classe,"",' + sans_lv2 + ')', {
+                    **F_RESTE2,
+                    **F_COTES,
+                    **bordure2,
+                })
+        else:
+            rep(lig_lv2 + i, 3 + NB_DIVS,
+                '=COUNTIFS(_Classe,"",' + nom_lv2[i] + ',1)', {
+                    **F_RESTE1,
+                    **F_COTES,
+                    **bordure2,
+                })
+
     # Colonne Totaux
     rep(0, 4 + NB_DIVS, 'Totaux', {
         **F_TOTAUX,
         **F_BORD,
     })
-    rep(
-        1, 4 + NB_DIVS,
-        '=SUM(' + lig_col(1, 2) + ':' + lig_col(1, 3 + NB_DIVS) + ')', {
-            **F_CLS,
-            **F_BORD,
-            **bordure, 'font_color': C_CAT['TOT2'][0],
-            'bg_color': C_CAT['TOT2'][1]
-        })
+    for i in range(5 + len(NIVEAUX) + len(OPTIONS_UNIQUES) + len(LV2S)):
+        l_retard = 4 + len(NIVEAUX)
+        l_lv2 = l_retard + len(OPTIONS_UNIQUES)
+        l_sans_lv2 = l_lv2 + len(LV2S)
+        bordure = F_COTES
+        if i in [0, l_retard, l_sans_lv2]:
+            bordure = F_BORD
+        if i in [1, 4, l_retard + 1, l_lv2 + 1]:
+            bordure = {**bordure, **F_HAUT}
+        if i in [2, l_retard - 1, l_lv2, l_sans_lv2 - 1]:
+            bordure = {**bordure, **F_BAS}
+        coul = F_TOTAUX2 if i in [0, l_retard, l_sans_lv2] else F_TOTAUX
+        if i == 3:
+            rep(i + 1, 4 + NB_DIVS, '=IF(' + lig_col(1, 4 + NB_DIVS) +
+                '<>0,ROUND(' + lig_col(2, 4 + NB_DIVS) + '/' +
+                lig_col(1, 4 + NB_DIVS) + '*100,0),"*")', {
+                    **F_TOTAUX2,
+                    **F_BORD,
+                })
+        else:
+            rep(i + 1, 4 + NB_DIVS, '=SUM(' + lig_col(i + 1, 2) + ':' +
+                lig_col(i + 1, 3 + NB_DIVS) + ')', {
+                    **coul,
+                    **bordure,
+                })
 
     # -~- Liste -~-
     # Entête
@@ -361,7 +500,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         retard = choice(test_retard)
         niv = choice(NIVEAUX)
         comp = choice(NIVEAUX)
-        classe = choice(NOM_DIVS)
+        classe = choice(NOM_DIVS + [''])
         div_orig = choice(test_div)
         lv2 = choice(test_lv2)
         sport = choice(test_sp)
@@ -533,16 +672,18 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         patates.set_row(dern2 + i, None, None, {'level': 1})
 
     patates.freeze_panes(3, 1)
+    liste.freeze_panes(premier_el,0)
 
-    patates.protect()
-    liste.protect(
-        options={
-            'insert_rows': True,
-            'delete_rows': True,
-            'sort': True,
-            'autofilter': True,
-        })
-    liste.activate()
+    if not DEBUG:
+        patates.protect()
+        liste.protect(
+            options={
+                'insert_rows': True,
+                'delete_rows': True,
+                'sort': True,
+                'autofilter': True,
+            })
+    if DEBUG: liste.activate()
 
 
 def jupyter():
@@ -553,6 +694,7 @@ def jupyter():
         return False
 
 
+from IPython.display import HTML, display
 if jupyter():
     display(
         HTML('<a href="./' + NOM_FICHIER +

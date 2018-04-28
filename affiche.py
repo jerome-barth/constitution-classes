@@ -1,4 +1,6 @@
+from IPython.display import HTML, display
 from config import *
+
 # Affichage des couleurs dans le notebook
 html = '<div style="overflow: auto;">'
 templ = '<div style="padding: 5pt; float: left; color: black; background-color: {};">' + \

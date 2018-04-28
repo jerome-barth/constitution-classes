@@ -90,3 +90,4 @@ F_OPT3 = [
     },
 ]
 F_LV = {**F_DEF, 'font_color': C_CAT['LV2'][0], 'bg_color': C_CAT['LV2'][1]}
+F_SLV = {'font_color': C_CAT['sLV2'][0], 'bg_color': C_CAT['sLV2'][1]}
