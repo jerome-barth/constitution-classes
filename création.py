@@ -60,7 +60,8 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     nom_liste = CLASSES + ' ' + str(2000 + ANNEE) + '-' + str(ANNEE + 1)
     liste = workbook.add_worksheet(nom_liste)
     liste.outline_settings(symbols_below=False)
-
+    if not DEBUG:
+        liste.set_vba_name('Feuil2')
     ##############################
     ###                        ###
     ###  Feuille 'Xe-20XX-XX'  ###
@@ -175,6 +176,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
             })
         rep(1, 2 + div, '=COUNTIF(_Classe,' + lig_col(0, 2 + div) + ')', {
             **F_CLS,
+            **F_GRAS,
             **F_HB,
             **bordure, 'bg_color': C_CLS[div][1]
         })
@@ -193,9 +195,11 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         rep(4, 2 + div, '=IF(' + lig_col(1, 2 + div) + '<>0,ROUND(' +
             lig_col(2, 2 + div) + '/' + lig_col(1, 2 + div) + '*100,0),"*")', {
                 **F_CLS,
+                **F_GRAS,
                 **F_HB,
                 **bordure, 'bg_color': C_CLS[div][1]
             })
+
         for i, niv in enumerate(NIVEAUX):
             bordure2 = {}
             if i == 0: bordure2 = F_HAUT
@@ -206,6 +210,13 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
                     **bordure,
                     **bordure2, 'bg_color': C_CLS[div][0]
                 })
+        liste.conditional_format(
+            5, 2 + div, 4 + len(NIVEAUX), 2 + div, {
+                'type': 'data_bar',
+                'bar_solid': True,
+                'bar_color': C_CLS[div][1],
+                'bar_axis_position': 'none',
+            })
         rep(5 + len(NIVEAUX), 2 + div,
             '=COUNTIFS(_Classe,' + lig_col(0, 2 + div) + ',_Retard,"R")', {
                 **F_CLS,
@@ -240,6 +251,17 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
                         **bordure,
                         **bordure2, 'bg_color': C_CLS[div][0]
                     })
+    liste.conditional_format(
+        4, 2, 4, NB_DIVS + 1, {
+            'type': 'data_bar',
+            'bar_color': '#cc66cc',
+            'bar_border_color': '#990099',
+            'bar_axis_position': 'none',
+            'min_type': 'num',
+            'max_type': 'num',
+            'min_value': -2,
+            'max_value': 102,
+        })
 
     # Colonne NA
     rep(0, 2 + NB_DIVS, 'NA', {
@@ -250,6 +272,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     })
     rep(1, 2 + NB_DIVS, '=COUNTIF(_Classe,"NA")', {
         **F_CLS,
+        **F_GRAS,
         **F_BORD,
         **bordure, 'bg_color': C_CLS[-1][1]
     })
@@ -267,6 +290,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         '=IF(' + lig_col(1, 2 + NB_DIVS) + '<>0,ROUND(' + lig_col(
             2, 2 + NB_DIVS) + '/' + lig_col(1, 2 + NB_DIVS) + '*100,0),"*")', {
                 **F_CLS,
+                **F_GRAS,
                 **F_BORD, 'bg_color': C_CLS[-1][1]
             })
     for i, niv in enumerate(NIVEAUX):
@@ -321,6 +345,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     })
     rep(1, 3 + NB_DIVS, '=COUNTBLANK(_Classe)', {
         **F_RESTE2,
+        **F_GRAS,
         **F_BORD,
     })
 
@@ -338,6 +363,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         '=IF(' + lig_col(1, 3 + NB_DIVS) + '<>0,ROUND(' + lig_col(
             2, 3 + NB_DIVS) + '/' + lig_col(1, 3 + NB_DIVS) + '*100,0),"*")', {
                 **F_RESTE2,
+                **F_GRAS,
                 **F_BORD,
             })
     for i, niv in enumerate(NIVEAUX):
@@ -400,6 +426,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
             bordure = {**bordure, **F_HAUT}
         if i in [2, l_retard - 1, l_lv2, l_sans_lv2 - 1]:
             bordure = {**bordure, **F_BAS}
+        if i == 0: bordure = {**bordure, **F_GRAS}
         coul = F_TOTAUX2 if i in [0, l_retard, l_sans_lv2] else F_TOTAUX
         if i == 3:
             rep(i + 1, 4 + NB_DIVS, '=IF(' + lig_col(1, 4 + NB_DIVS) +
@@ -470,6 +497,158 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         liste.set_row(premier_el + el, None, workbook.add_format(F_UNL))
     liste.autofilter(premier_el - 1, 0, dernier_el, col)
 
+    # Validation de données
+    #   Sexe : F ou G ou ''
+    liste.data_validation(premier_el, 2, dernier_el, 2, {
+        'validate': 'list',
+        'source': '=$B$3:$B$4'
+    })
+
+    liste.conditional_format(
+        premier_el, 2, dernier_el, 2, {
+            'type':
+            'cell',
+            'criteria':
+            'equal to',
+            'value':
+            '"F"',
+            'format':
+            workbook.add_format({
+                'font_color': C_CAT['F'][0],
+                'bg_color': C_CAT['F'][1]
+            })
+        })
+    liste.conditional_format(
+        premier_el, 2, dernier_el, 2, {
+            'type':
+            'cell',
+            'criteria':
+            'equal to',
+            'value':
+            '"G"',
+            'format':
+            workbook.add_format({
+                'font_color': C_CAT['G'][0],
+                'bg_color': C_CAT['G'][1]
+            })
+        })
+    #   Retard: R ou ''
+    liste.data_validation(premier_el, 3, dernier_el, 3, {
+        'validate': 'list',
+        'source': '=' + lig_col(lig_opt - 1, 1, True, True)
+    })
+    liste.conditional_format(
+        premier_el, 3, dernier_el, 3, {
+            'type':
+            'cell',
+            'criteria':
+            'equal to',
+            'value':
+            '"R"',
+            'format':
+            workbook.add_format({
+                'font_color': C_CAT['R'][0],
+                'bg_color': C_CAT['R'][1]
+            })
+        })
+
+    #   Niv / Comp
+    liste.data_validation(
+        premier_el, 4, dernier_el, 5, {
+            'validate':
+            'list',
+            'source':
+            '=' + lig_col(5, 1, True, True) + ':' +
+            lig_col(4 + len(NIVEAUX), 1, True, True)
+        })
+    for i, niv in enumerate(NIVEAUX):
+        liste.conditional_format(
+            premier_el, 4, dernier_el, 5, {
+                'type': 'cell',
+                'criteria': 'equal to',
+                'value': '"' + niv + '"',
+                'format': workbook.add_format(F_NIV[niv])
+            })
+
+    #   Classe
+    liste.data_validation(
+        premier_el, 6, dernier_el, 6, {
+            'validate':
+            'list',
+            'source':
+            '=' + lig_col(0, 2, True, True) + ':' +
+            lig_col(0, 2 + NB_DIVS, True, True)
+        })
+    #    coloration des noms/prénoms/classes suivant les classes
+    for i, classe in enumerate(NOM_DIVS):
+        if not type(classe) in [int, float]: classe = '"' + classe + '"'
+        liste.conditional_format(
+            premier_el, 6, dernier_el, 6, {
+                'type': 'cell',
+                'criteria': 'equal to',
+                'value': classe,
+                'format': workbook.add_format({
+                    'bg_color': C_CLS[i][0]
+                })
+            })
+        liste.conditional_format(
+            premier_el, 0, dernier_el, 1, {
+                'type':
+                'formula',
+                'criteria':
+                '=' + lig_col(premier_el, 6, False, True) + '=' + str(classe),
+                'format':
+                workbook.add_format({
+                    'bg_color': C_CLS[i][0]
+                })
+            })
+    liste.conditional_format(
+        premier_el, 6, dernier_el, 6, {
+            'type': 'cell',
+            'criteria': 'equal to',
+            'value': '"NA"',
+            'format': workbook.add_format({
+                'bg_color': C_CLS[-1][0]
+            })
+        })
+    liste.conditional_format(
+        premier_el, 0, dernier_el, 1, {
+            'type': 'formula',
+            'criteria': '=' + lig_col(premier_el, 6, False, True) + '="NA"',
+            'format': workbook.add_format({
+                'bg_color': C_CLS[-1][0]
+            })
+        })
+    #   LV2
+    liste.data_validation(premier_el, 8, dernier_el, 7 + len(LV2S_VRAIES), {
+        'validate': 'integer',
+        'criteria': 'equal to',
+        'value': 1
+    })
+    liste.conditional_format(
+        premier_el, 8, dernier_el, 7 + len(LV2S_VRAIES), {
+            'type': 'cell',
+            'criteria': 'equal to',
+            'value': 1,
+            'format': workbook.add_format(F_LV)
+        })
+    #   Options
+    compt = 0
+    for i, opt in enumerate(OPTIONS_UNIQUES):
+        deux_col = opt in OPTIONS_CAT
+        liste.conditional_format(
+            premier_el, 8 + len(LV2S_VRAIES) + i + compt, dernier_el,
+            8 + len(LV2S_VRAIES) + i + compt + deux_col, {
+                'type': 'cell',
+                'criteria': 'not equal to',
+                'value': '""',
+                'format': workbook.add_format(F_OPT3[i % 3])
+            })
+        if opt in OPTIONS_CAT: compt += 1
+
+    #    coloration des noms suivant le comportement
+    #     -> petit rouge
+    #     -> gros rouge
     ### TESTS ###
     # insertion de données de test
     test_nom = [
@@ -500,11 +679,11 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         retard = choice(test_retard)
         niv = choice(NIVEAUX)
         comp = choice(NIVEAUX)
-        classe = choice(NOM_DIVS + [''])
+        classe = choice(NOM_DIVS * 5 + ['', 'NA'])
         div_orig = choice(test_div)
         lv2 = choice(test_lv2)
         sport = choice(test_sp)
-        lat = choice(test_lat)
+        options = [choice(test_lat) for _ in OPTIONS_UNIQUES[1:]]
         obs = choice(test_obs)
         rep(premier_el + el, 0, nom, {
             **F_DEF,
@@ -513,18 +692,18 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         })
         rep(premier_el + el, 1, prenom, {**F_DEF, **F_UNL, 'align': 'left'})
         rep(premier_el + el, 2, sexe, {**F_DEF, **F_UNL})
-        liste.write_row(
-            premier_el + el, 2,
-            [sexe, retard, niv, comp, classe, div_orig] + lv2 + sport + [lat],
-            workbook.add_format({
+        liste.write_row(premier_el + el, 2,
+                        [sexe, retard, niv, comp, classe, div_orig] + lv2 +
+                        sport + options, workbook.add_format({
+                            **F_DEF,
+                            **F_UNL
+                        }))
+        rep(premier_el + el,
+            len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9, obs, {
                 **F_DEF,
-                **F_UNL
-            }))
-        rep(premier_el + el, 14, obs, {
-            **F_DEF,
-            **F_DROITE,
-            **F_UNL, 'align': 'left'
-        })
+                **F_DROITE,
+                **F_UNL, 'align': 'left'
+            })
 
     ###########################
     ###                     ###
@@ -550,7 +729,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     # Nombre de lignes par lv2
     nbl = len(OPTIONS) + 1
     # N° de la ligne après la dernière LV2
-    dern = (len(LV2S) + 1) * (len(OPTIONS) + 1) - 2
+    dern = len(LV2S) * (len(OPTIONS) + 1) + 3
     # N° de la ligne après la liste des options
     dern2 = dern + len(OPTIONS) + 2
 
@@ -566,6 +745,26 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         for i, lv2 in enumerate(LV2S):  # boucles sur les différentes LV2
             lig = i * nbl + 3
             col = 2 * div + 2
+            if i == len(LV2S) - 1:
+                pat(
+                    lig, col - 1, '=COUNTIFS(_Classe,' + lig_col(2, col - 1) +
+                    ',' + sans_lv2 + ')', {
+                        **F_CLS,
+                        **F_GRAS,
+                        **F_MOYEN,
+                        **F_HB,
+                        **F_GAUCHE, 'bg_color': C_CLS[div][1]
+                    })
+            else:
+                pat(
+                    lig, col - 1, '=COUNTIFS(_Classe,' + lig_col(2, col - 1) +
+                    ',' + nom_lv2[i] + ',1)', {
+                        **F_CLS,
+                        **F_GRAS,
+                        **F_MOYEN,
+                        **F_HB,
+                        **F_GAUCHE, 'bg_color': C_CLS[div][1]
+                    })
             pat(
                 lig, col, '=SUM(' + lig_col(lig + 1, col) + ':' +
                 lig_col(lig + nbl - 1, col) + ')', {
@@ -579,6 +778,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
                 bordure = {}
                 if j == 0: bordure = F_HAUT
                 if j == len(OPTIONS) - 1: bordure = {**bordure, **F_BAS}
+                pat(lig + j + 1, col - 1, 100 * div + 10 * i + j, {})
                 pat(
                     lig + j + 1, col, '*', {
                         **F_CLS,
@@ -672,7 +872,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         patates.set_row(dern2 + i, None, None, {'level': 1})
 
     patates.freeze_panes(3, 1)
-    liste.freeze_panes(premier_el,0)
+    liste.freeze_panes(premier_el, 0)
 
     if not DEBUG:
         patates.protect()
@@ -683,6 +883,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
                 'sort': True,
                 'autofilter': True,
             })
+
     if DEBUG: liste.activate()
 
 

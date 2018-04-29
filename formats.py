@@ -1,6 +1,6 @@
 # Formats de base
 
-from config import C_CAT
+from config import C_CAT, NIVEAUX
 
 F_DEF = {'align': 'center', 'valign': 'vcenter', 'font_size': 11}
 F_PETIT = {'font_size': 10}
@@ -74,6 +74,7 @@ F_NIV = {
         'bg_color': C_CAT['E'][1]
     }
 }
+assert len(NIVEAUX)<=len(F_NIV), "Il manque des formats pour les niveaux !"
 F_R = {**F_DEF, 'font_color': C_CAT['R'][0], 'bg_color': C_CAT['R'][1]}
 F_OPT3 = [
     {

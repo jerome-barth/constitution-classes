@@ -1,4 +1,5 @@
 DEBUG = True
+DEBUG = False
 
 from datetime import datetime
 from collections import OrderedDict
@@ -16,15 +17,15 @@ NB_DIVS = 8
 # NOM_DIVS = ['⊕', '⊖', '⊗', '⊘', '⊙', '⊚', '⊛', '⊜'][:NB_DIVS]
 # NOM_DIVS = ['ⅰ', 'ⅱ', 'ⅲ', 'ⅳ', 'ⅴ', 'ⅵ', 'ⅶ', 'ⅷ', 'ⅸ', 'ⅹ', 'ⅺ', 'ⅻ'][:NB_DIVS]
 # NOM_DIVS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'][:NB_DIVS]
-NOM_DIVS = ['α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ', 'ι', 'κ', 'λ', 'μ', 'ν', 'ξ', 'ο', 'π', 'ρ', 'σ', 'τ', 'υ', 'φ', 'χ', 'ψ', 'ω'][:NB_DIVS]
-# NOM_DIVS = [i + 1 for i in range(NB_DIVS)]  # Pour 1, 2,...
+# NOM_DIVS = ['α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ', 'ι', 'κ', 'λ', 'μ', 'ν', 'ξ', 'ο', 'π', 'ρ', 'σ', 'τ', 'υ', 'φ', 'χ', 'ψ', 'ω'][:NB_DIVS]
+NOM_DIVS = [i + 1 for i in range(NB_DIVS)]  # Pour 1, 2,...
 # NOM_DIVS = [2, 3, 4, 5, 6, 7, 8, 9]
 
 assert (NB_DIVS == len(NOM_DIVS)
         ), "Il faut autant de noms que de divisions prévues"
 
 NB_ELV = 25 * NB_DIVS + 20  # nb de lignes à prévoir dans la liste d'élèves
-if DEBUG: NB_ELV = 50
+if DEBUG: NB_ELV = 10
 LV2S = ['All2', 'Ita2', 'Esp2', 'Sans LV2']
 LV2S_VRAIES = LV2S[:-1]  # LV2 à afficher dans la liste
 
@@ -33,9 +34,9 @@ OPTIONS = OrderedDict([
     ('Sport', ['Sport']),
     ('Latin', ['Latin']),
     ('Sp-lat', ['Sport', 'Latin']),
-    #    ('Tricot',['Tricot']),
-    #    ('Origami',['Origami']),
-    #    ('Tricorigami',['Tricot','Origami'])
+    #('Tricot',['Tricot']),
+    #('Origami',['Origami']),
+    #('Tricorigami',['Tricot','Origami'])
 ])
 OPTIONS_UNIQUES = [opt for opt in OPTIONS if len(OPTIONS[opt]) == 1]
 OPTIONS_CAT = {
@@ -75,11 +76,11 @@ C_CAT = {
     'opt3': ('#660033', '#ff99cc'),
     'LV2': ('#000099', '#99ccff'),
     'sLV2': ('#000066', '#6699cc'),
-    'A': ('#009900', '#00ff00'),
-    'B': ('#669900', '#99ff33'),
-    'C': ('#999900', '#ffff00'),
-    'D': ('#993300', '#ff6600'),
-    'E': ('#990000', '#ff0000'),
+    'A': ('#003300', '#00ff00'),
+    'B': ('#003300', '#99ff33'),
+    'C': ('#333300', '#ffff00'),
+    'D': ('#330000', '#ff6600'),
+    'E': ('#330000', '#ff0000'),
     'R': ('#333333', '#999999'),
     'TOT': ('#3333cc', '#99cccc'),
     'TOT2': ('#3333cc', '#669999'),
