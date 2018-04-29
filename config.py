@@ -18,14 +18,14 @@ NB_DIVS = 8
 # NOM_DIVS = ['ⅰ', 'ⅱ', 'ⅲ', 'ⅳ', 'ⅴ', 'ⅵ', 'ⅶ', 'ⅷ', 'ⅸ', 'ⅹ', 'ⅺ', 'ⅻ'][:NB_DIVS]
 # NOM_DIVS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'][:NB_DIVS]
 # NOM_DIVS = ['α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ', 'ι', 'κ', 'λ', 'μ', 'ν', 'ξ', 'ο', 'π', 'ρ', 'σ', 'τ', 'υ', 'φ', 'χ', 'ψ', 'ω'][:NB_DIVS]
-NOM_DIVS = [i + 1 for i in range(NB_DIVS)]  # Pour 1, 2,...
-# NOM_DIVS = [2, 3, 4, 5, 6, 7, 8, 9]
+# NOM_DIVS = [i + 1 for i in range(NB_DIVS)]  # Pour 1, 2,...
+NOM_DIVS = [2, 3, 4, 5, 6, 7, 8, 9]
 
 assert (NB_DIVS == len(NOM_DIVS)
         ), "Il faut autant de noms que de divisions prévues"
 
 NB_ELV = 25 * NB_DIVS + 20  # nb de lignes à prévoir dans la liste d'élèves
-if DEBUG: NB_ELV = 10
+if DEBUG: NB_ELV = 50
 LV2S = ['All2', 'Ita2', 'Esp2', 'Sans LV2']
 LV2S_VRAIES = LV2S[:-1]  # LV2 à afficher dans la liste
 
@@ -87,6 +87,9 @@ C_CAT = {
     'CLS': ('#ffffff', '#000000'),
     'Reste1': ('#990000', '#ffffcc'),
     'Reste2': ('#990000', '#cccc99'),
+    'ptR':('#ff0000','#ffffff'),
+    'moyR':('#660000','#ff6600'),
+    'grR':('#660000','#ff0000'),
 }
 
 for niv in NIVEAUX:

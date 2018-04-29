@@ -1,13 +1,23 @@
+import builtins
+from IPython.lib import deepreload
+builtins.reload = deepreload.reload
+
+import config
+reload(config, exclude=['math', 'datetime', 'time', 'collections'])
+
 from IPython.display import HTML, display
 from config import *
 
 # Affichage des couleurs dans le notebook
 html = '<div style="overflow: auto;">'
 templ = '<div style="padding: 5pt; float: left; color: black; background-color: {};">' + \
-        '<strong>Couleur classe {}</strong></div>'
+        '<strong>Couleur {}</strong></div>'
 for i, (coul1, coul2) in enumerate(C_CLS):
-    html += templ.format(coul1, i + 1 if i + 1 != len(C_CLS) else 'NA')
-    html += templ.format(coul2, i + 1 if i + 1 != len(C_CLS) else 'NA')
+    if i < NB_DIVS: n_cls = 'classe '+str(NOM_DIVS[i])
+    elif NB_DIVS<=i<len(C_CLS)-1: n_cls ='supplémentaire'
+    else: n_cls = 'élèves NA'
+    html += templ.format(coul1, n_cls)
+    html += templ.format(coul2, n_cls)
     if not (i + 1) % 3: html += '</div><br><div style="overflow: auto;">'
 html += '</div>'
 html += '<br><div style="overflow: auto;">'

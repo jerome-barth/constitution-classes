@@ -497,7 +497,24 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         liste.set_row(premier_el + el, None, workbook.add_format(F_UNL))
     liste.autofilter(premier_el - 1, 0, dernier_el, col)
 
-    # Validation de données
+    # Validation de données et formatage
+    # NA -> ligne grisée
+    liste.conditional_format(
+        premier_el, 0, dernier_el,
+        len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9, {
+            'type':
+            'formula',
+            'criteria':
+            '=' + lig_col(premier_el, 6, False, True) + '="NA"',
+            'stop_if_true':
+            True,
+            'format':
+            workbook.add_format({
+                'font_color': C_CLS[-1][1],
+                'bg_color': C_CLS[-1][0],
+            })
+        })
+
     #   Sexe : F ou G ou ''
     liste.data_validation(premier_el, 2, dernier_el, 2, {
         'validate': 'list',
@@ -579,6 +596,70 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
             '=' + lig_col(0, 2, True, True) + ':' +
             lig_col(0, 2 + NB_DIVS, True, True)
         })
+    # NA
+    liste.conditional_format(
+        premier_el, 0, dernier_el,
+        len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9, {
+            'type':
+            'formula',
+            'criteria':
+            '=' + lig_col(premier_el, 6, False, True) + '="NA"',
+            'stop_if_true':
+            True,
+            'format':
+            workbook.add_format({
+                'font_color': C_CLS[-1][1],
+                'bg_color': C_CLS[-1][0],
+            })
+        })
+    #    coloration des noms suivant le comportement
+    #     -> petit rouge : comportement C
+    liste.conditional_format(
+        premier_el, 0, dernier_el, 1, {
+            'type':
+            'formula',
+            'criteria':
+            '=' + lig_col(premier_el, 5, False, True) + '="' +
+            str(NIVEAUX[-3] + '"'),
+            'format':
+            workbook.add_format({
+                'font_color': C_CAT['ptR'][0],
+                'bold': True,
+                'italic': True,
+            })
+        })
+    #     -> moyen rouge : comportement D
+    liste.conditional_format(
+        premier_el, 0, dernier_el, 1, {
+            'type':
+            'formula',
+            'criteria':
+            '=' + lig_col(premier_el, 5, False, True) + '="' +
+            str(NIVEAUX[-2] + '"'),
+            'format':
+            workbook.add_format({
+                'font_color': C_CAT['moyR'][0],
+                'bg_color': C_CAT['moyR'][1],
+                'bold': True,
+                'italic': True,
+            })
+        })
+    #     -> gros rouge  : comportement E
+    liste.conditional_format(
+        premier_el, 0, dernier_el, 1, {
+            'type':
+            'formula',
+            'criteria':
+            '=' + lig_col(premier_el, 5, False, True) + '="' +
+            str(NIVEAUX[-1] + '"'),
+            'format':
+            workbook.add_format({
+                'font_color': C_CAT['grR'][0],
+                'bg_color': C_CAT['grR'][1],
+                'bold': True,
+                'italic': True,
+            })
+        })
     #    coloration des noms/prénoms/classes suivant les classes
     for i, classe in enumerate(NOM_DIVS):
         if not type(classe) in [int, float]: classe = '"' + classe + '"'
@@ -608,17 +689,24 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
             'criteria': 'equal to',
             'value': '"NA"',
             'format': workbook.add_format({
-                'bg_color': C_CLS[-1][0]
+                'bg_color': C_CLS[-1][0],
             })
         })
     liste.conditional_format(
-        premier_el, 0, dernier_el, 1, {
-            'type': 'formula',
-            'criteria': '=' + lig_col(premier_el, 6, False, True) + '="NA"',
-            'format': workbook.add_format({
-                'bg_color': C_CLS[-1][0]
+        premier_el, 6, dernier_el, 6, {
+            'type':
+            'cell',
+            'criteria':
+            'equal to',
+            'value':
+            '""',
+            'format':
+            workbook.add_format({
+                'font_color': C_CAT['Reste1'][1],
+                'bg_color': C_CAT['Reste1'][0],
             })
         })
+
     #   LV2
     liste.data_validation(premier_el, 8, dernier_el, 7 + len(LV2S_VRAIES), {
         'validate': 'integer',
@@ -635,6 +723,12 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     #   Options
     compt = 0
     for i, opt in enumerate(OPTIONS_UNIQUES):
+        liste.data_validation(premier_el, 8 + len(LV2S_VRAIES) + i + compt,
+                              dernier_el, 8 + len(LV2S_VRAIES) + i + compt, {
+                                  'validate': 'integer',
+                                  'criteria': 'equal to',
+                                  'value': 1
+                              })
         deux_col = opt in OPTIONS_CAT
         liste.conditional_format(
             premier_el, 8 + len(LV2S_VRAIES) + i + compt, dernier_el,
@@ -646,9 +740,21 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
             })
         if opt in OPTIONS_CAT: compt += 1
 
-    #    coloration des noms suivant le comportement
-    #     -> petit rouge
-    #     -> gros rouge
+    # coloration ligne sans classe
+    liste.conditional_format(
+        premier_el, 0, dernier_el,
+        len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9, {
+            'type':
+            'formula',
+            'criteria':
+            '=' + lig_col(premier_el, 6, False, True) + '=""',
+            'format':
+            workbook.add_format({
+                'font_color': C_CAT['Reste1'][0],
+                'bg_color': C_CAT['Reste1'][1],
+                'bold': True,
+            })
+        })
     ### TESTS ###
     # insertion de données de test
     test_nom = [
@@ -711,15 +817,18 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     test_sp = [['', '']] * 10 + [[1, 'FOOTBALL'], [1, 'GYMNASTIQUE'],
                                  [1, 'BASKET']]
     test_lat = [''] * 10 + [1]
-    test_obs = [''] * 5 + ['Teigne', 'Peste', 'Bon en maths']
+    test_obs = [''] * 5 + [
+        'Teigne', 'Peste', 'Pénible', 'Insupportable', 'Très fort',
+        'Bon en maths', 'Bon en français', 'Bon en sport'
+    ]
 
     from random import choice
     for el in range(NB_ELV):
         nom = choice(test_nom)
         prenom, sexe = choice(list(test_prenom.items()))
         retard = choice(test_retard)
-        niv = choice(NIVEAUX)
-        comp = choice(NIVEAUX)
+        niv = choice(NIVEAUX[:-2] * 5 + NIVEAUX[-2:] * 2)
+        comp = choice(NIVEAUX[:-3] * 5 + NIVEAUX[-3:])
         classe = choice(NOM_DIVS * 5 + ['', 'NA'])
         div_orig = choice(test_div)
         lv2 = choice(test_lv2)
@@ -783,9 +892,9 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
             **F_GROS,
             **F_BORD, 'bg_color': C_CLS[div][0]
         })
+        col = 2 * div + 2
         for i, lv2 in enumerate(LV2S):  # boucles sur les différentes LV2
             lig = i * nbl + 3
-            col = 2 * div + 2
             if i == len(LV2S) - 1:
                 pat(
                     lig, col - 1, '=COUNTIFS(_Classe,' + lig_col(2, col - 1) +
@@ -819,7 +928,33 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
                 bordure = {}
                 if j == 0: bordure = F_HAUT
                 if j == len(OPTIONS) - 1: bordure = {**bordure, **F_BAS}
-                pat(lig + j + 1, col - 1, 100 * div + 10 * i + j, {})
+                cond = []
+                for option in OPTIONS_UNIQUES:
+                    nosp = '_' + ''.join(option.split())
+                    cond.append(nosp)
+                    if option in OPTIONS[opt]: cond.append('1')
+                    else: cond.append('""')
+                    txt_cond = ','.join(cond)
+                if i == len(LV2S) - 1:
+                    pat(
+                        lig + j + 1, col - 1,
+                        '=COUNTIFS(_Classe,' + lig_col(2, col - 1) + ',' +
+                        sans_lv2 + ',' + txt_cond + ')', {
+                            **F_CLS,
+                            **F_PETIT,
+                            **F_GAUCHE,
+                            **bordure, 'bg_color': C_CLS[div][0]
+                        })
+                else:
+                    pat(
+                        lig + j + 1, col - 1,
+                        '=COUNTIFS(_Classe,' + lig_col(2, col - 1) + ',' +
+                        nom_lv2[i] + ',1,' + txt_cond + ')', {
+                            **F_CLS,
+                            **F_PETIT,
+                            **F_GAUCHE,
+                            **bordure, 'bg_color': C_CLS[div][0]
+                        })
                 pat(
                     lig + j + 1, col, '*', {
                         **F_CLS,
@@ -828,15 +963,173 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
                         **F_UNL,
                         **bordure, 'bg_color': C_CLS[div][0]
                     })
+        ### tab récap du bas
+        lignes_lv2 = [i * nbl + 3 for i in range(len(LV2S))]
+        txt_somme = '=SUM(' + ','.join(
+            [lig_col(l, col - 1) for l in lignes_lv2]) + ')'
+        txt_somme2 = '=SUM(' + ','.join([lig_col(l, col)
+                                         for l in lignes_lv2]) + ')'
+        pat(
+            dern + 1, col - 1, txt_somme, {
+                **F_CLS,
+                **F_GRAS,
+                **F_MOYEN,
+                **F_HB,
+                **F_GAUCHE, 'bg_color': C_CLS[div][1]
+            })
+        pat(
+            dern + 1, col, txt_somme2, {
+                **F_CLS,
+                **F_GRAS,
+                **F_MOYEN,
+                **F_HB,
+                **F_DROITE, 'bg_color': C_CLS[div][1]
+            })
+        for i, _ in enumerate(OPTIONS):
+            lignes_opt = [l + i + 1 for l in lignes_lv2]
+            txt_somme_opt = '=SUM(' + ','.join(
+                [lig_col(l, col - 1) for l in lignes_opt]) + ')'
+            txt_somme_opt2 = '=SUM(' + ','.join(
+                [lig_col(l, col) for l in lignes_opt]) + ')'
+            bordure = F_BAS if i == len(OPTIONS) - 1 else {}
+            pat(
+                dern + i + 2, col - 1, txt_somme_opt, {
+                    **F_CLS,
+                    **F_PETIT,
+                    **F_GAUCHE, 'bg_color': C_CLS[div][0],
+                    **bordure
+                })
+            pat(
+                dern + i + 2, col, txt_somme_opt2, {
+                    **F_CLS,
+                    **F_PETIT,
+                    **F_DROITE, 'bg_color': C_CLS[div][0],
+                    **bordure
+                })
+        for i, opt in enumerate(OPTIONS_UNIQUES):
+            lignes_opt = []
+            for j, option in enumerate(OPTIONS):
+                if opt in OPTIONS[option]:
+                    lignes_opt.append(j)
+            txt = '=SUM(' + ','.join(
+                [lig_col(dern + 2 + l, col - 1) for l in lignes_opt]) + ')'
+            txt2 = '=SUM(' + ','.join(
+                [lig_col(dern + 2 + l, col) for l in lignes_opt]) + ')'
+            bordure = {}
+            if i == 0: bordure = F_HAUT
+            if i == len(OPTIONS_UNIQUES) - 1: bordure = {**bordure, **F_BAS}
+            pat(
+                dern2 + i, col - 1, txt, {
+                    **F_CLS,
+                    **F_PETIT,
+                    **F_GAUCHE, 'bg_color': C_CLS[div][0],
+                    **bordure
+                })
+            pat(
+                dern2 + i, col, txt2, {
+                    **F_CLS,
+                    **F_PETIT,
+                    **F_DROITE, 'bg_color': C_CLS[div][0],
+                    **bordure
+                })
+###
 
-    # dernière catégorie : NA
+# dernière catégorie : NA
     pat(1, 2 * NB_DIVS + 1, TX_YA, F_YA)
     pat(2, 2 * NB_DIVS + 1, 'NA', {
         **F_CLS,
         **F_GRAS,
         **F_BORD, 'bg_color': C_CLS[-1][0]
     })
-
+    col = 2 * NB_DIVS + 1
+    for i, lv2 in enumerate(LV2S):  # boucles sur les différentes LV2
+        lig = i * nbl + 3
+        if i == len(LV2S) - 1:
+            pat(lig, col,
+                '=COUNTIFS(_Classe,' + lig_col(2, col) + ',' + sans_lv2 + ')',
+                {
+                    **F_CLS,
+                    **F_GRAS,
+                    **F_MOYEN,
+                    **F_BORD, 'bg_color': C_CLS[-1][1]
+                })
+        else:
+            pat(lig, col, '=COUNTIFS(_Classe,' + lig_col(2, col) + ',' +
+                nom_lv2[i] + ',1)', {
+                    **F_CLS,
+                    **F_GRAS,
+                    **F_MOYEN,
+                    **F_BORD, 'bg_color': C_CLS[-1][1]
+                })
+        for j, opt in enumerate(OPTIONS):  # boucles sur les options
+            bordure = {}
+            if j == 0: bordure = F_HAUT
+            if j == len(OPTIONS) - 1: bordure = {**bordure, **F_BAS}
+            cond = []
+            for option in OPTIONS_UNIQUES:
+                nosp = '_' + ''.join(option.split())
+                cond.append(nosp)
+                if option in OPTIONS[opt]: cond.append('1')
+                else: cond.append('""')
+                txt_cond = ','.join(cond)
+            if i == len(LV2S) - 1:
+                pat(
+                    lig + j + 1, col, '=COUNTIFS(_Classe,' + lig_col(2, col) +
+                    ',' + sans_lv2 + ',' + txt_cond + ')', {
+                        **F_CLS,
+                        **F_PETIT,
+                        **F_COTES,
+                        **bordure, 'bg_color': C_CLS[-1][0]
+                    })
+            else:
+                pat(
+                    lig + j + 1, col, '=COUNTIFS(_Classe,' + lig_col(2, col) +
+                    ',' + nom_lv2[i] + ',1,' + txt_cond + ')', {
+                        **F_CLS,
+                        **F_PETIT,
+                        **F_COTES,
+                        **bordure, 'bg_color': C_CLS[-1][0]
+                    })
+    lignes_lv2 = [i * nbl + 3 for i in range(len(LV2S))]
+    txt_somme = '=SUM(' + ','.join(
+        [lig_col(l, col) for l in lignes_lv2]) + ')'
+    pat(
+        dern + 1, col, txt_somme, {
+            **F_CLS,
+            **F_GRAS,
+            **F_MOYEN,
+            **F_BORD, 'bg_color': C_CLS[-1][1]
+        })
+    for i, _ in enumerate(OPTIONS):
+        lignes_opt = [l + i + 1 for l in lignes_lv2]
+        txt_somme_opt = '=SUM(' + ','.join(
+            [lig_col(l, col) for l in lignes_opt]) + ')'
+        bordure = F_BAS if i == len(OPTIONS) - 1 else {}
+        pat(
+            dern + i + 2, col, txt_somme_opt, {
+                **F_CLS,
+                **F_PETIT,
+                **F_COTES, 'bg_color': C_CLS[-1][0],
+                **bordure
+            })
+    for i, opt in enumerate(OPTIONS_UNIQUES):
+        lignes_opt = []
+        for j, option in enumerate(OPTIONS):
+            if opt in OPTIONS[option]:
+                lignes_opt.append(j)
+        txt = '=SUM(' + ','.join(
+            [lig_col(dern + 2 + l, col) for l in lignes_opt]) + ')'
+        bordure = {}
+        if i == 0: bordure = F_HAUT
+        if i == len(OPTIONS_UNIQUES) - 1: bordure = {**bordure, **F_BAS}
+        pat(
+            dern2 + i, col, txt, {
+                **F_CLS,
+                **F_PETIT,
+                **F_COTES, 'bg_color': C_CLS[-1][0],
+                **bordure
+            })
+###
     # Totaux
     pat(1, 2 * NB_DIVS + 2, TX_YA, F_YA)
     pat(1, 2 * NB_DIVS + 3, TX_FAUT, F_FAUT)
@@ -846,6 +1139,157 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         **F_BORD,
         **F_GROS,
     })
+    col = 2 * NB_DIVS + 4
+    for i, lv2 in enumerate(LV2S):  # boucles sur les différentes LV2
+        lig = i * nbl + 3
+
+        if i == len(LV2S) - 1:
+            pat(lig, col, '=COUNTIFS(' + sans_lv2 + ')', {
+                **F_TOTAUX2,
+                **F_GRAS,
+                **F_MOYEN,
+                **F_HB,
+                **F_DROITE,
+            })
+        else:
+            pat(lig, col, '=COUNTIFS(' + nom_lv2[i] + ',1)', {
+                **F_TOTAUX2,
+                **F_GRAS,
+                **F_MOYEN,
+                **F_HB,
+                **F_DROITE,
+            })
+        for j, opt in enumerate(OPTIONS):  # boucles sur les options
+            bordure = {}
+            if j == 0: bordure = F_HAUT
+            if j == len(OPTIONS) - 1: bordure = {**bordure, **F_BAS}
+            cond = []
+            for option in OPTIONS_UNIQUES:
+                nosp = '_' + ''.join(option.split())
+                cond.append(nosp)
+                if option in OPTIONS[opt]: cond.append('1')
+                else: cond.append('""')
+                txt_cond = ','.join(cond)
+            if i == len(LV2S) - 1:
+                pat(lig + j + 1, col,
+                    '=COUNTIFS(' + sans_lv2 + ',' + txt_cond + ')', {
+                        **F_TOTAUX,
+                        **F_PETIT,
+                        **F_DROITE,
+                        **bordure,
+                    })
+            else:
+                pat(lig + j + 1, col,
+                    '=COUNTIFS(' + nom_lv2[i] + ',1,' + txt_cond + ')', {
+                        **F_TOTAUX,
+                        **F_PETIT,
+                        **F_DROITE,
+                        **bordure,
+                    })
+###
+    lignes_lv2 = [i * nbl + 3 for i in range(len(LV2S))]
+    txt_somme = '=SUM(' + ','.join(
+        [lig_col(l, col-2) for l in lignes_lv2]) + ')'
+    txt_somme2 = '=SUM(' + ','.join(
+        [lig_col(l, col-1) for l in lignes_lv2]) + ')'
+    txt_somme3 = '=SUM(' + ','.join(
+        [lig_col(l, col) for l in lignes_lv2]) + ')'
+
+    pat(
+        dern + 1, col-2, txt_somme, {
+            **F_TOTAUX2,
+            **F_GRAS,
+            **F_MOYEN,
+            **F_HB,**F_GAUCHE
+        })
+    pat(
+        dern + 1, col-1, txt_somme2, {
+            **F_TOTAUX2,
+            **F_GRAS,
+            **F_MOYEN,
+            **F_HB
+        })
+    pat(
+        dern + 1, col, txt_somme3, {
+            **F_TOTAUX2,
+            **F_GRAS,
+            **F_MOYEN,
+            **F_HB,**F_DROITE
+        })
+
+    for i, _ in enumerate(OPTIONS):
+        lignes_opt = [l + i + 1 for l in lignes_lv2]
+        txt_somme_opt = '=SUM(' + ','.join(
+            [lig_col(l, col-2) for l in lignes_opt]) + ')'
+        txt_somme_opt2 = '=SUM(' + ','.join(
+            [lig_col(l, col-1) for l in lignes_opt]) + ')'
+        txt_somme_opt3 = '=SUM(' + ','.join(
+            [lig_col(l, col) for l in lignes_opt]) + ')'
+        bordure = F_BAS if i == len(OPTIONS) - 1 else {}
+        pat(
+            dern + i + 2, col-2, txt_somme_opt, {
+                **F_TOTAUX,
+                **F_PETIT,
+                **F_GAUCHE,
+                **bordure
+            })
+        pat(
+            dern + i + 2, col-1, txt_somme_opt2, {
+                **F_TOTAUX,
+                **F_PETIT,
+                **bordure
+            })
+        pat(
+            dern + i + 2, col, txt_somme_opt3, {
+                **F_TOTAUX,
+                **F_PETIT,
+                **F_DROITE,
+                **bordure
+            })
+
+    for i, opt in enumerate(OPTIONS_UNIQUES):
+        lignes_opt = []
+        for j, option in enumerate(OPTIONS):
+            if opt in OPTIONS[option]:
+                lignes_opt.append(j)
+        txt = '=SUM(' + ','.join(
+            [lig_col(dern + 2 + l, col-2) for l in lignes_opt]) + ')'
+        txt2 = '=SUM(' + ','.join(
+            [lig_col(dern + 2 + l, col-1) for l in lignes_opt]) + ')'
+        txt3 = '=SUM(' + ','.join(
+            [lig_col(dern + 2 + l, col) for l in lignes_opt]) + ')'
+        bordure = {}
+        if i == 0: bordure = F_HAUT
+        if i == len(OPTIONS_UNIQUES) - 1: bordure = {**bordure, **F_BAS}
+        pat(
+            dern2 + i, col-2, txt, {
+                **F_TOTAUX,
+                **F_PETIT,
+                **F_GAUCHE,
+                **bordure
+            })
+        pat(
+            dern2 + i, col-1, txt2, {
+                **F_TOTAUX,
+                **F_PETIT,
+                **bordure
+            })
+        pat(
+            dern2 + i, col, txt3, {
+                **F_TOTAUX,
+                **F_PETIT,
+                **F_DROITE,
+                **bordure
+            })
+
+
+
+
+
+
+
+####
+
 
     # Création des formules dans les colonnes
     for i, lv2 in enumerate(LV2S):  # sommes dans les totaux
@@ -898,8 +1342,8 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
                 OPTIONS) - 1 else {}
             pat(i * nbl + j + 4, 0, opt, {**F_OPT, **bordure})
             patates.set_row(i * nbl + j + 4, None, None, {'level': 1})
-
-    pat(dern + 1, 0, 'Effectifs', F_LV2)
+    patates.set_row(dern, 10)
+    pat(dern + 1, 0, 'Effectifs', {**F_LV2, **F_MOYEN})
     for i, opt in enumerate(OPTIONS):
         bordure = F_BAS if i == len(OPTIONS) - 1 else {}
         pat(dern + i + 2, 0, opt, {**F_OPT, **bordure})
@@ -925,7 +1369,8 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
                 'autofilter': True,
             })
 
-    if DEBUG: liste.activate()
+    if DEBUG: patates.activate()
+    # if DEBUG: liste.activate()
 
 
 def jupyter():
@@ -939,8 +1384,8 @@ def jupyter():
 from IPython.display import HTML, display
 if jupyter():
     display(
-        HTML('<a href="./' + NOM_FICHIER +
-             '" target="_blank">Lien vers le fichier</a>'))
+        HTML('<h1><a href="./' + NOM_FICHIER +
+             '" target="_blank">Lien vers le fichier</a></h1>'))
 else:
     import os
     os.startfile(NOM_FICHIER)
