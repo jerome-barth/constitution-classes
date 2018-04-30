@@ -31,7 +31,7 @@ F_TOTAUX2 = {
 F_RENTREE = {**F_DEF, **F_GRAS, **F_GROS}
 F_CLS = {**F_DEF}
 F_YA = {**F_DEF, **F_PETIT}
-F_FAUT = {**F_DEF, **F_PETIT}
+F_FAUT = {**F_DEF, **F_PETIT, **F_GRAS, 'italic':True}
 F_LST = {**F_DEF, **F_PETIT}
 F_LV2 = {**F_DEF, **F_GRAS, **F_BORD, 'bg_color': C_CAT['sLV2'][1]}
 F_OPT = {**F_DEF, **F_COTES, 'bg_color': C_CAT['LV2'][1]}
@@ -74,7 +74,7 @@ F_NIV = {
         'bg_color': C_CAT['E'][1]
     }
 }
-assert len(NIVEAUX)<=len(F_NIV), "Il manque des formats pour les niveaux !"
+assert len(NIVEAUX) <= len(F_NIV), "Il manque des formats pour les niveaux !"
 F_R = {**F_DEF, 'font_color': C_CAT['R'][0], 'bg_color': C_CAT['R'][1]}
 F_OPT3 = [
     {
@@ -92,3 +92,8 @@ F_OPT3 = [
 ]
 F_LV = {**F_DEF, 'font_color': C_CAT['LV2'][0], 'bg_color': C_CAT['LV2'][1]}
 F_SLV = {'font_color': C_CAT['sLV2'][0], 'bg_color': C_CAT['sLV2'][1]}
+F_ERR = {**F_GRAS, 'font_color': C_CAT['ERR'][0], 'bg_color': C_CAT['ERR'][1]}
+F_ERRP = {
+    **F_GRAS, 'font_color': C_CAT['ERRP'][0],
+    'bg_color': C_CAT['ERRP'][1]
+}

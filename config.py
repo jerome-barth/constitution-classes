@@ -1,34 +1,30 @@
-DEBUG = True
-DEBUG = False
-
-from datetime import datetime
 from collections import OrderedDict
 
-##### PARAMETRAGE UTILISATEUR
-ANNEE = datetime.today().year % 100  # automatique
-# ANNEE = 18                         # manuel : décommenter
+##### PARAMÉTRAGE UTILISATEUR
+### Laisser le # pour avoir l'année en cours
+# ANNEE = 18
+
 ETABLISSEMENT = 'Collège Marie Curie'
 VILLE = 'Troyes'
+
 CLASSES = '3e'
 
-NB_DIVS = 8
+NB_DIVS = 5
 ### Exemples de noms de divisions
-# NOM_DIVS = ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'][:NB_DIVS]
-# NOM_DIVS = ['⊕', '⊖', '⊗', '⊘', '⊙', '⊚', '⊛', '⊜'][:NB_DIVS]
-# NOM_DIVS = ['ⅰ', 'ⅱ', 'ⅲ', 'ⅳ', 'ⅴ', 'ⅵ', 'ⅶ', 'ⅷ', 'ⅸ', 'ⅹ', 'ⅺ', 'ⅻ'][:NB_DIVS]
-# NOM_DIVS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'][:NB_DIVS]
-# NOM_DIVS = ['α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ', 'ι', 'κ', 'λ', 'μ', 'ν', 'ξ', 'ο', 'π', 'ρ', 'σ', 'τ', 'υ', 'φ', 'χ', 'ψ', 'ω'][:NB_DIVS]
+# NOM_DIVS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'][:NB_DIVS]
+# NOM_DIVS = ['α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ', 'ι', 'κ', 'λ', 'μ'][:NB_DIVS]
+# NOM_DIVS = ['ν', 'ξ', 'ο', 'π', 'ρ', 'σ', 'τ', 'υ', 'φ', 'χ', 'ψ', 'ω'][:NB_DIVS]
 # NOM_DIVS = [i + 1 for i in range(NB_DIVS)]  # Pour 1, 2,...
-NOM_DIVS = [2, 3, 4, 5, 6, 7, 8, 9]
+NOM_DIVS = [10 + i for i in range(NB_DIVS)]  # Pour 10, 11, ...
 
-assert (NB_DIVS == len(NOM_DIVS)
-        ), "Il faut autant de noms que de divisions prévues"
 
-NB_ELV = 25 * NB_DIVS + 20  # nb de lignes à prévoir dans la liste d'élèves
-if DEBUG: NB_ELV = 50
+# Nombre d'élèves prévus (approximatif, des lignes peuvent être ajoutées ou retirées)
+NB_ELV = 24 * NB_DIVS + 10
+
+# LV2 envisagées : la dernière ('Sans LV2') est traitée de manière spécifique
 LV2S = ['All2', 'Ita2', 'Esp2', 'Sans LV2']
-LV2S_VRAIES = LV2S[:-1]  # LV2 à afficher dans la liste
 
+# Options compatibles du type : ('Nom', ['opt1', 'opt2',...] )
 OPTIONS = OrderedDict([
     ('Sans opt', []),
     ('Sport', ['Sport']),
@@ -38,19 +34,19 @@ OPTIONS = OrderedDict([
     #('Origami',['Origami']),
     #('Tricorigami',['Tricot','Origami'])
 ])
-OPTIONS_UNIQUES = [opt for opt in OPTIONS if len(OPTIONS[opt]) == 1]
-OPTIONS_CAT = {
-    'Sport': 'Section'
-}  # Créer une colonne supplém 'Section' pour le type de sport
 
+# Options pour lesquelles il faut 2 colonnes (typiquement Sport-Étude avec la Section)
+OPTIONS_CAT = {'Sport': 'Section'}
+
+# Pour classer les élèves (scolaire et comportement)
 NIVEAUX = ['A', 'B', 'C', 'D', 'E']
 
-NOM_FICHIER = 'R' + str(ANNEE) + '-Repart-' + CLASSES
-NOM_FICHIER += '.xls' + ('m' if not DEBUG else 'x')
-# NOM_FICHIER = 'R18-Repart-3e.xlsm' # Attention de ne pas mettre '*.xlsx'
 
-##### DEFINITION DES COULEURS
-# Pour la couleur de fond des classes (clair, foncé)
+### Laisser le # pour avoir le nom de fichier par défaut (du type 'R18-Répart-3e.xlsm')
+# NOM_FICHIER = 'R18-Répart-3e' # Attention de ne pas mettre d'extension'
+
+##### DÉFINITION DES COULEURS
+# Pour la couleur de fond pour les classes : (clair, foncé)
 C_CLS = [
     ('#66ff99', '#00cc33'),  # vert clair
     ('#99ffff', '#00cccc'),  # cyan
@@ -64,36 +60,30 @@ C_CLS = [
     ('#cccccc', '#999999'),  # gris (pour NA)
 ]
 
-assert (len(C_CLS) > NB_DIVS), "Trop de classes, pas assez de couleurs"
-
-# Pour les étiquettes 'Etiquette': (txt, fond)
+# Pour les étiquettes : 'Etiquette': (txt, fond)
 C_CAT = {
-    'F': ('#990000', '#ff6666'),
-    'G': ('#0000cc', '#66ccff'),
-    '%F': ('#990099', '#ffccff'),
-    'opt1': ('#000099', '#00ffff'),
-    'opt2': ('#330066', '#cc99ff'),
-    'opt3': ('#660033', '#ff99cc'),
-    'LV2': ('#000099', '#99ccff'),
-    'sLV2': ('#000066', '#6699cc'),
-    'A': ('#003300', '#00ff00'),
-    'B': ('#003300', '#99ff33'),
-    'C': ('#333300', '#ffff00'),
-    'D': ('#330000', '#ff6600'),
-    'E': ('#330000', '#ff0000'),
-    'R': ('#333333', '#999999'),
-    'TOT': ('#3333cc', '#99cccc'),
-    'TOT2': ('#3333cc', '#669999'),
-    'CLS': ('#ffffff', '#000000'),
-    'Reste1': ('#990000', '#ffffcc'),
-    'Reste2': ('#990000', '#cccc99'),
-    'ptR':('#ff0000','#ffffff'),
-    'moyR':('#660000','#ff6600'),
-    'grR':('#660000','#ff0000'),
+    'F': ('#990000', '#ff6666'),        # filles
+    'G': ('#0000cc', '#66ccff'),        # garçons
+    '%F': ('#990099', '#ffccff'),       # pourcentage de filles
+    'opt1': ('#000099', '#00ffff'),     # cycle de 3 couleurs
+    'opt2': ('#330066', '#cc99ff'),     #     pour les différentes
+    'opt3': ('#660033', '#ff99cc'),     #     options uniques
+    'LV2': ('#000099', '#99ccff'),      # couleur pour les options de lv2
+    'sLV2': ('#000066', '#6699cc'),     # couleur pour "Sans LV2"
+    'A': ('#003300', '#00ff00'),        # couleurs pour les différents niveaux
+    'B': ('#003300', '#99ff33'),        #      il faut adapter ceci à la liste
+    'C': ('#333300', '#ffff00'),        #      des niveaux ci-dessus
+    'D': ('#330000', '#ff6600'),        #
+    'E': ('#330000', '#ff0000'),        #
+    'R': ('#333333', '#999999'),        #
+    'TOT': ('#3333cc', '#99cccc'),      # couleur claire pour les totaux
+    'TOT2': ('#3333cc', '#669999'),     # couleur foncée pour les totaux
+    'CLS': ('#ffffff', '#000000'),      # couleur d'entête pour la division
+    'Reste1': ('#990000', '#ffffcc'),   # couleur colonne 'Reste' (clair)
+    'Reste2': ('#990000', '#cccc99'),   # couleur colonne 'Reste' (foncé)
+    'ptR': ('#ff0000', '#ffffff'),      # couleur pour comportement (avant-avant-dernier)
+    'moyR': ('#660000', '#ff6600'),     # couleur pour comportement (avant-dernier)
+    'grR': ('#660000', '#ff0000'),      # couleur pour comportement (dernier)
+    'ERR': ('#ff0000', '#000000'),      # Disparité prévision/répartition
+    'ERRP': ('#ffffff', '#ff0000'),     # Erreur de structure
 }
-
-for niv in NIVEAUX:
-    assert (niv in C_CAT), "Pb définition des niveaux"
-
-TX_YA = 'Placés'  # 'Il y a'
-TX_FAUT = 'Prévus'  # 'Il faut'
