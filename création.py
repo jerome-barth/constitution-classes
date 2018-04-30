@@ -21,11 +21,11 @@ OPTIONS_UNIQUES = [opt for opt in OPTIONS if len(OPTIONS[opt]) == 1]
 
 try:
     ANNEE
-except NameError:   
+except NameError:
     ANNEE = datetime.today().year % 100  # automatique
 
 try:
-    NOM_FICHIER += '.xlsm'
+    if 'xlsm' != NOM_FICHIER.split('.')[-1]: NOM_FICHIER += '.xlsm'
 except NameError:
     NOM_FICHIER = 'R' + str(ANNEE) + '-Répart-' + CLASSES + '.xlsm'
 
@@ -812,6 +812,20 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
                 'font_color': C_CLS[-1][1],
                 'bg_color': C_CLS[-1][0],
             })
+        })
+    # Erreurs de lv2
+    liste.conditional_format(
+        premier_el, 0, dernier_el,
+        len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9, {
+            'type':
+            'formula',
+            'criteria':
+            '=SUM(' + lig_col(premier_el, 8, False, True) + ':' +
+            lig_col(premier_el, 7 + len(LV2S_VRAIES), False, True) + ')>1',
+            'stop_if_true':
+            True,
+            'format':
+            workbook.add_format(F_ERR),
         })
 
     #   Sexe : F ou G ou ''
@@ -1740,8 +1754,12 @@ def jupyter():
 from IPython.display import HTML, display
 if jupyter():
     display(
-        HTML('<h1><a href="./' + NOM_FICHIER +
-             '" target="_blank">Lien vers le fichier</a></h1>'))
+        HTML(
+            '<p>Création du fichier terminée. Cliquer le lien ci-dessous pour le télécharger.</p><hr><h1><a href="./'
+            + NOM_FICHIER +
+            '" target="_blank">Lien vers le fichier</a></h1><br>' +
+            '<h2 align="center">Pour se faire un peu de place dans Excel :</h2><img src="xl_place.png">'
+        ))
 else:
     import os
     os.startfile(NOM_FICHIER)
