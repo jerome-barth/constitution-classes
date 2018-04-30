@@ -51,6 +51,9 @@ def lig_col(lig, col, lig_abs=False, col_abs=False):
         col = (col - 1) // 26
     return col_abs + col_str + lig_abs + str(lig)
 
+import hashlib
+if hashlib.sha224(input("Mot de passe ? ").encode('utf-8')).hexdigest()!='9a48a0a06af408a3200c12938ac9267da16ba1080268603604082c4b':
+    raise ValueError('Mot de passe erroné !')
 
 with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
 
