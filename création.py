@@ -51,9 +51,20 @@ def lig_col(lig, col, lig_abs=False, col_abs=False):
         col = (col - 1) // 26
     return col_abs + col_str + lig_abs + str(lig)
 
-import hashlib
-if hashlib.sha224(input("Mot de passe ? ").encode('utf-8')).hexdigest()!='9a48a0a06af408a3200c12938ac9267da16ba1080268603604082c4b':
-    raise ValueError('Mot de passe erroné !')
+
+def jupyter():
+    try:
+        shell = get_ipython().__class__.__name__
+        return shell == 'ZMQInteractiveShell'
+    except NameError:
+        return False
+
+
+if jupyter():
+    import hashlib
+    if hashlib.sha224(input("Mot de passe ? ").encode('utf-8')).hexdigest(
+    ) != '9a48a0a06af408a3200c12938ac9267da16ba1080268603604082c4b':
+        raise ValueError('Mot de passe erroné !')
 
 with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
 
@@ -1625,6 +1636,15 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
                     'font_color': C_CLS[div][0]
                 })
             })
+        patates.conditional_format(
+            dern + 1, col + 1, dern2 + len(OPTIONS_UNIQUES) - 1, col + 1, {
+                'type': 'cell',
+                'criteria': 'equal to',
+                'value': 0,
+                'format': workbook.add_format({
+                    'font_color': C_CLS[div][0]
+                })
+            })
     #NA
     col = 2 * NB_DIVS + 1
     for j in lignes_lv2:
@@ -1736,6 +1756,38 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     patates.freeze_panes(3, 1)
     liste.freeze_panes(premier_el, 0)
 
+    # zones d'impression
+    patates.set_landscape()
+    patates.set_paper(9)  # A4
+    patates.center_horizontally()
+    patates.center_vertically()
+    patates.set_margins(0.4, 0.4, 0.4, 0.4)
+    patates.set_header('', {'margin': 0})
+    patates.set_footer('', {'margin': 0})
+    patates.hide_gridlines()
+    patates.print_area(0, 0, dern2 + len(OPTIONS_UNIQUES), 2 * NB_DIVS + 4)
+    patates.fit_to_pages(1, 1)
+
+    liste.set_landscape()
+    liste.set_paper(9)  # A4
+    liste.center_horizontally()
+    #liste.center_vertically()
+    liste.set_margins(0.4, 0.4, 0.4, 0.4)
+    liste.set_header('', {'margin': 0})
+    liste.set_footer('', {'margin': 0})
+    liste.hide_gridlines()
+    liste.repeat_rows(premier_el - 1)
+    liste.print_area(0, 0, dernier_el,
+                     max(
+                         len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9,
+                         4 + NB_DIVS))
+    liste.fit_to_pages(1, 0)
+    liste.set_h_pagebreaks(
+        [premier_el - 1] +
+        [premier_el + (i + 1) * NB_ELV // NB_DIVS for i in range(NB_DIVS)])
+    liste.set_v_pagebreaks(
+        [max(len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9, 4 + NB_DIVS) + 1])
+
     patates.protect()
     liste.protect(
         options={
@@ -1744,15 +1796,6 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
             'sort': True,
             'autofilter': True,
         })
-
-
-def jupyter():
-    try:
-        shell = get_ipython().__class__.__name__
-        return shell == 'ZMQInteractiveShell'
-    except NameError:
-        return False
-
 
 from IPython.display import HTML, display
 if jupyter():
