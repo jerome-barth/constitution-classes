@@ -814,7 +814,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     # NA -> ligne grisée
     liste.conditional_format(
         premier_el, 0, dernier_el,
-        len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9, {
+        len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + len(OPTIONS_CAT)+8, {
             'type':
             'formula',
             'criteria':
@@ -830,7 +830,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     # Erreurs de lv2
     liste.conditional_format(
         premier_el, 0, dernier_el,
-        len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9, {
+        len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + len(OPTIONS_CAT)+8, {
             'type':
             'formula',
             'criteria':
@@ -1057,7 +1057,7 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     # coloration ligne sans classe
     liste.conditional_format(
         premier_el, 0, dernier_el,
-        len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9, {
+        len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + len(OPTIONS_CAT)+8, {
             'type':
             'formula',
             'criteria':
@@ -1127,7 +1127,15 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     }
     test_retard = [''] * 10 + ['R']
     test_div = ['4e' + str(i + 1) for i in range(8)] + ['Nv3e']
-    test_lv2 = [[1, '', ''], ['', 1, ''], ['', '', 1]] * 5 + [['', '', '']]
+    test_lv2 = []
+    for i in range(len(LV2S_VRAIES)):
+        lg=[]
+        for j in range(len(LV2S_VRAIES)):
+            if i==j:
+                lg.append(1)
+            else:
+                lg.append('')
+        test_lv2.append(lg)
     test_sp = [['', '']] * 10 + [[1, 'FOOTBALL'], [1, 'GYMNASTIQUE'],
                                  [1, 'BASKET']]
     test_lat = [''] * 10 + [1]
@@ -1146,8 +1154,12 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         classe = choice(NOM_DIVS * 5 + [''] * NB_DIVS * 10 + ['NA'] * NB_DIVS)
         div_orig = choice(test_div)
         lv2 = choice(test_lv2)
-        sport = choice(test_sp)
-        options = [choice(test_lat) for _ in OPTIONS_UNIQUES[1:]]
+        opts = []
+        for opt in OPTIONS_UNIQUES:
+            if opt in OPTIONS_CAT:
+                opts +=choice(test_sp)
+            else:
+                opts.append(choice(test_lat))
         obs = choice(test_obs)
         rep(premier_el + el, 0, nom, {
             **F_DEF,
@@ -1157,13 +1169,13 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         rep(premier_el + el, 1, prenom, {**F_DEF, **F_UNL, 'align': 'left'})
         rep(premier_el + el, 2, sexe, {**F_DEF, **F_UNL})
         liste.write_row(premier_el + el, 2,
-                        [sexe, retard, niv, comp, classe, div_orig] + lv2 +
-                        sport + options, workbook.add_format({
+                        [sexe, retard, niv, comp, classe, div_orig] + lv2+opts, workbook.add_format({
                             **F_DEF,
                             **F_UNL
                         }))
         rep(premier_el + el,
-            len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9, obs, {
+            len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + len(OPTIONS_CAT)+8,
+             obs, {
                 **F_DEF,
                 **F_DROITE,
                 **F_UNL, 'align': 'left'
@@ -1779,14 +1791,14 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
     liste.repeat_rows(premier_el - 1)
     liste.print_area(0, 0, dernier_el,
                      max(
-                         len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9,
+                         len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + len(OPTIONS_CAT)+8,
                          4 + NB_DIVS))
     liste.fit_to_pages(1, 0)
     liste.set_h_pagebreaks(
         [premier_el - 1] +
         [premier_el + (i + 1) * NB_ELV // NB_DIVS for i in range(NB_DIVS)])
     liste.set_v_pagebreaks(
-        [max(len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + 9, 4 + NB_DIVS) + 1])
+        [max(len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + len(OPTIONS_CAT)+8, 4 + NB_DIVS) + 1])
 
     patates.protect()
     liste.protect(
