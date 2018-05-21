@@ -60,11 +60,11 @@ def jupyter():
         return False
 
 
-if jupyter():
-    import hashlib
-    if hashlib.sha224(input("Mot de passe ? ").encode('utf-8')).hexdigest(
-    ) != '9a48a0a06af408a3200c12938ac9267da16ba1080268603604082c4b':
-        raise ValueError('Mot de passe erroné !')
+#if jupyter():
+#    import hashlib
+#    if hashlib.sha224(input("Mot de passe ? ").encode('utf-8')).hexdigest(
+#    ) != '9a48a0a06af408a3200c12938ac9267da16ba1080268603604082c4b':
+#        raise ValueError('Mot de passe erroné !')
 
 with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
 
