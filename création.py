@@ -1,9 +1,29 @@
 # coding: utf-8
-from config import *
 from formats import *
 
 import xlsxwriter
 from datetime import datetime
+
+import builtins
+from IPython.lib import deepreload
+builtins.reload = deepreload.reload
+
+import config
+reload(config, exclude=['math', 'datetime', 'time', 'collections'])
+
+from collections import OrderedDict
+ETABLISSEMENT = str(config.ETABLISSEMENT)
+VILLE = str(config.ETABLISSEMENT)
+CLASSES = str(config.CLASSES)
+NB_DIVS = int(config.NB_DIVS)
+NOM_DIVS = list(config.NOM_DIVS)
+NB_ELV = int(config.NB_ELV)
+LV2S = list(config.LV2S)
+OPTIONS = OrderedDict(config.OPTIONS)
+OPTIONS_CAT = dict(config.OPTIONS_CAT)
+NIVEAUX = list(config.NIVEAUX)
+C_CLS = list(config.C_CLS)
+C_CAT = dict(config.C_CAT)
 
 assert (NB_DIVS == len(NOM_DIVS)
         ), "Il faut autant de noms que de divisions prévues"
@@ -24,10 +44,7 @@ try:
 except NameError:
     ANNEE = datetime.today().year % 100  # automatique
 
-try:
-    if 'xlsm' != NOM_FICHIER.split('.')[-1]: NOM_FICHIER += '.xlsm'
-except NameError:
-    NOM_FICHIER = 'R' + str(ANNEE) + '-Répart-' + CLASSES + '.xlsm'
+NOM_FICHIER = 'R' + str(ANNEE) + '-Répart-' + CLASSES + '.xlsm'
 
 TX_YA = 'Placés'  # 'Il y a'
 TX_FAUT = 'Prévus'  # 'Il faut'
