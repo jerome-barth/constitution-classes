@@ -13,7 +13,7 @@ reload(config, exclude=['math', 'datetime', 'time', 'collections'])
 
 from collections import OrderedDict
 ETABLISSEMENT = str(config.ETABLISSEMENT)
-VILLE = str(config.ETABLISSEMENT)
+VILLE = str(config.VILLE)
 CLASSES = str(config.CLASSES)
 NB_DIVS = int(config.NB_DIVS)
 NOM_DIVS = list(config.NOM_DIVS)
@@ -24,6 +24,7 @@ OPTIONS_CAT = dict(config.OPTIONS_CAT)
 NIVEAUX = list(config.NIVEAUX)
 C_CLS = list(config.C_CLS)
 C_CAT = dict(config.C_CAT)
+FICTIF = bool(config.FICTIF)
 
 assert (NB_DIVS == len(NOM_DIVS)
         ), "Il faut autant de noms que de divisions prévues"
@@ -1088,115 +1089,116 @@ with xlsxwriter.Workbook(NOM_FICHIER) as workbook:
         })
     ### TESTS ###
     # insertion de données de test
-    test_nom = [
-        'AGOSTINHO', 'ARMATA', 'ARNON', 'ATIFI', 'AUNOS', 'BARTH', 'BELNOT',
-        'BERTHEUX', 'BIANCHI', 'CANDERAN', 'CARDONNE', 'CLAUSSE', 'CONVERT',
-        'CROZAT', 'CRÉVOULIN', 'DE MARCH', 'DEFRANCE', 'DEHRI', 'DUS',
-        'FERREIRA', 'GARNIER', 'GHARBI', 'GOTTRANT', 'HALATA', 'HAUMESSER',
-        'HURPOIL', 'LABILLE', 'LLATY', 'LOISEAU', 'NOEL', 'PANTALEON',
-        'PIERRE', 'POCHOT', 'POINTU', 'PRÉVOT', 'REGNIER', 'RIVIÈRE',
-        'RONDEAU', 'ROUVROY', 'RUBASZEWSKI', 'SERVAS', 'SIMON', 'SIMONNOT',
-        'SPAY', 'TILLIET', 'TRINQUET', 'TROCHAIN', 'VANHAREN', 'WOJSZVZYK'
-    ]
-    test_prenom = {
-        'Alexandre': 'G',
-        'Aline': 'F',
-        'Anne': 'F',
-        'Carole': 'F',
-        'Cassandre': 'F',
-        'Clothilde': 'F',
-        'Cécile': 'F',
-        'Cédric': 'G',
-        'Céline': 'F',
-        'Daniel': 'G',
-        'Didier': 'G',
-        'Dominique': 'G',
-        'Fanny': 'F',
-        'Florence': 'F',
-        'Franck': 'G',
-        'Frédéric': 'G',
-        'Frédérique': 'F',
-        'Guillaume': 'G',
-        'Isabelle': 'F',
-        'Jean-Pierre': 'G',
-        'Julie': 'F',
-        'Jérémie': 'G',
-        'Jérôme': 'G',
-        'Katia': 'F',
-        'Mangni': 'F',
-        'Marie': 'F',
-        'Marie-Louis': 'G',
-        'Marie-Lourdes': 'F',
-        'Mathieu': 'G',
-        'Mohammed': 'G',
-        'Nathalie': 'F',
-        'Nelly': 'F',
-        'Nicolas': 'G',
-        'Rachida': 'F',
-        'Romain': 'G',
-        'Sandra': 'F',
-        'Sandrine': 'F',
-        'Stéphane': 'G',
-        'Séverine': 'F',
-        'Virginie': 'F',
-        'Émilie': 'F',
-        'Évelyne': 'F'
-    }
-    test_retard = [''] * 10 + ['R']
-    test_div = ['4e' + str(i + 1) for i in range(8)] + ['Nv3e']
-    test_lv2 = []
-    for i in range(len(LV2S_VRAIES)):
-        lg=[]
-        for j in range(len(LV2S_VRAIES)):
-            if i==j:
-                lg.append(1)
-            else:
-                lg.append('')
-        test_lv2.append(lg)
-    test_sp = [['', '']] * 10 + [[1, 'FOOTBALL'], [1, 'GYMNASTIQUE'],
-                                 [1, 'BASKET']]
-    test_lat = [''] * 10 + [1]
-    test_obs = [''] * 5 + [
-        'Teigne', 'Peste', 'Pénible', 'Insupportable', 'Très fort',
-        'Bon en maths', 'Bon en français', 'Bon en sport'
-    ]
+    if FICTIF:
+        test_nom = [
+            'AGOSTINHO', 'ARMATA', 'ARNON', 'ATIFI', 'AUNOS', 'BARTH', 'BELNOT',
+            'BERTHEUX', 'BIANCHI', 'CANDERAN', 'CARDONNE', 'CLAUSSE', 'CONVERT',
+            'CROZAT', 'CRÉVOULIN', 'DE MARCH', 'DEFRANCE', 'DEHRI', 'DUS',
+            'FERREIRA', 'GARNIER', 'GHARBI', 'GOTTRANT', 'HALATA', 'HAUMESSER',
+            'HURPOIL', 'LABILLE', 'LLATY', 'LOISEAU', 'NOEL', 'PANTALEON',
+            'PIERRE', 'POCHOT', 'POINTU', 'PRÉVOT', 'REGNIER', 'RIVIÈRE',
+            'RONDEAU', 'ROUVROY', 'RUBASZEWSKI', 'SERVAS', 'SIMON', 'SIMONNOT',
+            'SPAY', 'TILLIET', 'TRINQUET', 'TROCHAIN', 'VANHAREN', 'WOJSZVZYK'
+        ]
+        test_prenom = {
+            'Alexandre': 'G',
+            'Aline': 'F',
+            'Anne': 'F',
+            'Carole': 'F',
+            'Cassandre': 'F',
+            'Clothilde': 'F',
+            'Cécile': 'F',
+            'Cédric': 'G',
+            'Céline': 'F',
+            'Daniel': 'G',
+            'Didier': 'G',
+            'Dominique': 'G',
+            'Fanny': 'F',
+            'Florence': 'F',
+            'Franck': 'G',
+            'Frédéric': 'G',
+            'Frédérique': 'F',
+            'Guillaume': 'G',
+            'Isabelle': 'F',
+            'Jean-Pierre': 'G',
+            'Julie': 'F',
+            'Jérémie': 'G',
+            'Jérôme': 'G',
+            'Katia': 'F',
+            'Mangni': 'F',
+            'Marie': 'F',
+            'Marie-Louis': 'G',
+            'Marie-Lourdes': 'F',
+            'Mathieu': 'G',
+            'Mohammed': 'G',
+            'Nathalie': 'F',
+            'Nelly': 'F',
+            'Nicolas': 'G',
+            'Rachida': 'F',
+            'Romain': 'G',
+            'Sandra': 'F',
+            'Sandrine': 'F',
+            'Stéphane': 'G',
+            'Séverine': 'F',
+            'Virginie': 'F',
+            'Émilie': 'F',
+            'Évelyne': 'F'
+        }
+        test_retard = [''] * 10 + ['R']
+        test_div = ['4e' + str(i + 1) for i in range(8)] + ['Nv3e']
+        test_lv2 = []
+        for i in range(len(LV2S_VRAIES)):
+            lg=[]
+            for j in range(len(LV2S_VRAIES)):
+                if i==j:
+                    lg.append(1)
+                else:
+                    lg.append('')
+            test_lv2.append(lg)
+        test_sp = [['', '']] * 10 + [[1, 'FOOTBALL'], [1, 'GYMNASTIQUE'],
+                                    [1, 'BASKET']]
+        test_lat = [''] * 10 + [1]
+        test_obs = [''] * 5 + [
+            'Teigne', 'Peste', 'Pénible', 'Insupportable', 'Très fort',
+            'Bon en maths', 'Bon en français', 'Bon en sport'
+        ]
 
-    from random import choice
-    for el in range(NB_ELV):
-        nom = choice(test_nom)
-        prenom, sexe = choice(list(test_prenom.items()))
-        retard = choice(test_retard)
-        niv = choice(NIVEAUX[:-2] * 5 + NIVEAUX[-2:] * 2)
-        comp = choice(NIVEAUX[:-3] * 5 + NIVEAUX[-3:])
-        classe = choice(NOM_DIVS * 5 + [''] * NB_DIVS * 10 + ['NA'] * NB_DIVS)
-        div_orig = choice(test_div)
-        lv2 = choice(test_lv2)
-        opts = []
-        for opt in OPTIONS_UNIQUES:
-            if opt in OPTIONS_CAT:
-                opts +=choice(test_sp)
-            else:
-                opts.append(choice(test_lat))
-        obs = choice(test_obs)
-        rep(premier_el + el, 0, nom, {
-            **F_DEF,
-            **F_GAUCHE,
-            **F_UNL, 'align': 'left'
-        })
-        rep(premier_el + el, 1, prenom, {**F_DEF, **F_UNL, 'align': 'left'})
-        rep(premier_el + el, 2, sexe, {**F_DEF, **F_UNL})
-        liste.write_row(premier_el + el, 2,
-                        [sexe, retard, niv, comp, classe, div_orig] + lv2+opts, workbook.add_format({
-                            **F_DEF,
-                            **F_UNL
-                        }))
-        rep(premier_el + el,
-            len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + len(OPTIONS_CAT)+8,
-             obs, {
+        from random import choice
+        for el in range(NB_ELV):
+            nom = choice(test_nom)
+            prenom, sexe = choice(list(test_prenom.items()))
+            retard = choice(test_retard)
+            niv = choice(NIVEAUX[:-2] * 5 + NIVEAUX[-2:] * 2)
+            comp = choice(NIVEAUX[:-3] * 5 + NIVEAUX[-3:])
+            classe = choice(NOM_DIVS * 5 + [''] * NB_DIVS * 10 + ['NA'] * NB_DIVS)
+            div_orig = choice(test_div)
+            lv2 = choice(test_lv2)
+            opts = []
+            for opt in OPTIONS_UNIQUES:
+                if opt in OPTIONS_CAT:
+                    opts +=choice(test_sp)
+                else:
+                    opts.append(choice(test_lat))
+            obs = choice(test_obs)
+            rep(premier_el + el, 0, nom, {
                 **F_DEF,
-                **F_DROITE,
+                **F_GAUCHE,
                 **F_UNL, 'align': 'left'
             })
+            rep(premier_el + el, 1, prenom, {**F_DEF, **F_UNL, 'align': 'left'})
+            rep(premier_el + el, 2, sexe, {**F_DEF, **F_UNL})
+            liste.write_row(premier_el + el, 2,
+                            [sexe, retard, niv, comp, classe, div_orig] + lv2+opts, workbook.add_format({
+                                **F_DEF,
+                                **F_UNL
+                            }))
+            rep(premier_el + el,
+                len(LV2S_VRAIES) + len(OPTIONS_UNIQUES) + len(OPTIONS_CAT)+8,
+                obs, {
+                    **F_DEF,
+                    **F_DROITE,
+                    **F_UNL, 'align': 'left'
+                })
 
     ###########################
     ###                     ###

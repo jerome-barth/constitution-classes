@@ -9,7 +9,7 @@ VILLE = 'Troyes'
 
 CLASSES = '3e'
 
-NB_DIVS = 5
+NB_DIVS = 10
 ### Exemples de noms de divisions
 # NOM_DIVS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'][:NB_DIVS]
 # NOM_DIVS = ['α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ', 'ι', 'κ', 'λ', 'μ'][:NB_DIVS]
@@ -25,7 +25,8 @@ LV2S = ['All2', 'Ita2', 'Esp2', 'Sans LV2']
 
 # Options compatibles du type : ('Nom', ['opt1', 'opt2',...] )
 OPTIONS = OrderedDict([
-    ('Sans opt', []), ('Sport', ['Sport']),
+    ('Sans opt', []),
+    ('Sport', ['Sport']),
     ('Latin', ['Latin']),
     ('Sp-lat', ['Sport', 'Latin']),
 #    ('Tricot', ['Tricot']),
@@ -39,8 +40,9 @@ OPTIONS_CAT = {'Sport': 'Section'}
 # Pour classer les élèves (scolaire et comportement)
 NIVEAUX = ['A', 'B', 'C', 'D', 'E']
 
-### Laisser le # pour avoir le nom de fichier par défaut (du type 'R18-Répart-3e.xlsm')
-# NOM_FICHIER = 'R18-Répart-3e' # Attention de ne pas mettre d'extension'
+### Mettre des données fictives pour les élèves ou laisser les lignes blanches
+FICTIF = False
+#FICTIF = True
 
 ##### DÉFINITION DES COULEURS
 # Pour la couleur de fond pour les classes : (clair, foncé)
@@ -54,6 +56,7 @@ C_CLS = [
     ('#ffcccc', '#cc9999'),  # rose
     ('#99ff66', '#00cc00'),  # vert lime
     ('#ccff00', '#99cc00'),  # jaune citron
+    ('#6699ff', '#3366ff'),  # bleu
     ('#cccccc', '#999999'),  # gris (pour NA)
 ]
 
