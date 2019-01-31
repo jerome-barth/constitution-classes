@@ -21,7 +21,7 @@ NB_ELV = 24 * NB_DIVS + 10
 # NB_ELV = 130
 
 # LV2 envisagées : la dernière ('Sans LV2') est traitée de manière spécifique
-LV2S = ['All2', 'Ita2', 'Esp2', 'Sans LV2']
+LV2S = ['Bi', 'All2', 'Ita2', 'Esp2', 'Sans LV2']
 
 # Options compatibles du type : ('Nom', ['opt1', 'opt2',...] )
 OPTIONS = OrderedDict([
@@ -41,8 +41,8 @@ OPTIONS_CAT = {'Sport': 'Section'}
 NIVEAUX = ['A', 'B', 'C', 'D', 'E']
 
 ### Mettre des données fictives pour les élèves ou laisser les lignes blanches
-FICTIF = False
-#FICTIF = True
+#FICTIF = False
+FICTIF = True
 
 ##### DÉFINITION DES COULEURS
 # Pour la couleur de fond pour les classes : (clair, foncé)
