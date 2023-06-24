@@ -4,10 +4,17 @@ from collections import OrderedDict
 ### Laisser le # pour avoir l'année en cours
 # ANNEE = 18
 
-ETABLISSEMENT = 'Collège Marie Curie'
+%%writefile config.py
+from collections import OrderedDict
+
+##### PARAMÉTRAGE UTILISATEUR
+### Laisser le # pour avoir l'année en cours
+# ANNEE = 18
+
+ETABLISSEMENT = 'Lycée Marie de Champagne'
 VILLE = 'Troyes'
 
-CLASSES = '3e'
+CLASSES = '2de'
 
 NB_DIVS = 10
 ### Exemples de noms de divisions
@@ -17,31 +24,37 @@ NB_DIVS = 10
 NOM_DIVS = [i + 1 for i in range(NB_DIVS)]  # Pour 1, 2,...
 
 # Nombre d'élèves prévus (approximatif, des lignes peuvent être ajoutées ou retirées)
-NB_ELV = 24 * NB_DIVS + 10
+NB_ELV = 36 * NB_DIVS + 10
 # NB_ELV = 130
 
 # LV2 envisagées : la dernière ('Sans LV2') est traitée de manière spécifique
-LV2S = ['Bi', 'All2', 'Ita2', 'Esp2', 'Sans LV2']
+LV2S = ['All2', 'Esp2', 'CNED', 'Sans LV2']
 
 # Options compatibles du type : ('Nom', ['opt1', 'opt2',...] )
 OPTIONS = OrderedDict([
     ('Sans opt', []),
-    ('Sport', ['Sport']),
+    ('Euro', ['Euro']),
+    ('Chinois', ['Chinois']),
+    ('Arabe', ['Arabe']),
     ('Latin', ['Latin']),
-    ('Sp-lat', ['Sport', 'Latin']),
+    ('Grec', ['Grec']),
+    ('Musique', ['Musique']),
+    ('ArtsPla', ['ArtsPla']),
+    ('Audiovisuel', ['Audiovisuel']),
+    ('SantéSocial', ['SantéSocial']),    
 #    ('Tricot', ['Tricot']),
 #    ('Origami', ['Origami']),
 #    ('Tricorilatin', ['Tricot', 'Origami', 'Latin']),
 ])
 
 # Options pour lesquelles il faut 2 colonnes (typiquement Sport-Étude avec la Section)
-OPTIONS_CAT = {'Sport': 'Section'}
+OPTIONS_CAT = {}
 
 # Pour classer les élèves (scolaire et comportement)
 NIVEAUX = ['A', 'B', 'C', 'D', 'E']
 
 ### Mettre des données fictives pour les élèves ou laisser les lignes blanches
-#FICTIF = False
+FICTIF = False
 FICTIF = True
 
 ##### DÉFINITION DES COULEURS
