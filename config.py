@@ -38,17 +38,22 @@ OPTIONS = OrderedDict([
     ('Arabe', ['Arabe']),
     ('Latin', ['Latin']),
     ('Grec', ['Grec']),
-    ('Musique', ['Musique']),
-    ('ArtsPla', ['ArtsPla']),
-    ('Audiovisuel', ['Audiovisuel']),
-    ('SantéSocial', ['SantéSocial']),    
+    ('Mus', ['Mus']),
+    ('Arts', ['Arts']),
+    ('AV', ['AV']),
+    ('2S', ['2S']),
+    ('ELat', ['Euro', 'Latin']),
+    ('EGrec', ['Euro', 'Grec']),
+    ('EMus', ['Euro', 'Mus']),
 #    ('Tricot', ['Tricot']),
 #    ('Origami', ['Origami']),
 #    ('Tricorilatin', ['Tricot', 'Origami', 'Latin']),
 ])
 
 # Options pour lesquelles il faut 2 colonnes (typiquement Sport-Étude avec la Section)
-OPTIONS_CAT = {}
+OPTIONS_CAT = {
+#    'Sport': 'Section'
+}
 
 # Pour classer les élèves (scolaire et comportement)
 NIVEAUX = ['A', 'B', 'C', 'D', 'E']
