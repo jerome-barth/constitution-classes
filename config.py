@@ -4,13 +4,6 @@ from collections import OrderedDict
 ### Laisser le # pour avoir l'année en cours
 # ANNEE = 18
 
-%%writefile config.py
-from collections import OrderedDict
-
-##### PARAMÉTRAGE UTILISATEUR
-### Laisser le # pour avoir l'année en cours
-# ANNEE = 18
-
 ETABLISSEMENT = 'Lycée Marie de Champagne'
 VILLE = 'Troyes'
 
