@@ -51,7 +51,7 @@ OPTIONS = OrderedDict([
 ])
 
 # Options pour lesquelles il faut 2 colonnes (typiquement Sport-Étude avec la Section)
-OPTIONS_CAT = {
+OPTIONS_CAT = { 
 #    'Sport': 'Section'
 }
 
